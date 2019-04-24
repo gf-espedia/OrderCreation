@@ -1,0 +1,35 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:c="sap.ui.commons"
+	xmlns:lay="sap.ui.layout" xmlns:f="sap.ui.layout.form">
+	<Dialog resizable="false" class="sapUiSizeCompact" title="{i18n>AddOperation}">
+		<buttons>
+			<Button text="{i18n>Ok}" press="onNewOperationConfirmPress" type="Accept"/>
+			<Button text="{i18n>Cancel}" press="onNewOperationCancelPress" type="Reject"/>
+		</buttons>
+		<content>
+			<Table id="newOperationsTable" items="{/NewOperations}" inset="false">
+				<columns>
+					<Column minScreenWidth="Tablet" demandPopin="true" width="10%"/>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Label required="true" text="{i18n>Operations}"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true">
+						<Label required="true" text="Activity H"/>
+					</Column>
+					<!--Column minScreenWidth="Desktop" demandPopin="true">
+						<Label text="Activity Type"/>
+					</Column!-->
+					<Column demandPopin="true" width="10%"></Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<Input value="{path: 'Activity'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>
+						<Input value="{path: 'Description'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>
+						<Input value="{path: 'DurationNormal'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>
+						<!--<Input value="{path: 'Acttype'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>-->
+						<Button icon="sap-icon://sys-cancel" type="Transparent"></Button>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Dialog>
+</core:FragmentDefinition>

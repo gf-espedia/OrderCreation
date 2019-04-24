@@ -1,0 +1,221 @@
+<mvc:View controllerName="com.espedia.demo.OrderCreation.controller.OrderCreation" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:core="sap.ui.core">
+	<App id="idAppControl">
+		<pages>
+			<NavContainer id="navCon">
+				<Page id="orderCreatePage" title="Work Center">
+					<content>
+						<ObjectHeader icon="sap-icon://eam-work-order" title="{i18n>title}" responsive="true" fullScreenOptimized="true" backgroundDesign="Solid"
+							class="createOrderPageHeader"></ObjectHeader>
+						<Toolbar class="toolBlue">
+							<HBox width="3rem"></HBox>
+							<ToolbarSpacer/>
+							<Text text="Info" class="text-white"></Text>
+							<ToolbarSpacer/>
+							<Button class="roundClass" type="Accept" press="handleNavRight" icon="sap-icon://arrow-right"></Button>
+						</Toolbar>
+						<VBox>
+							<f:Form id="equiFormOrd" editable="true">
+								<f:title>
+									<core:Title text="{i18n>Equipment}"/>
+								</f:title>
+								<f:layout>
+									<f:ResponsiveGridLayout labelSpanXL="4" labelSpanL="3" labelSpanM="3" labelSpanS="12" adjustLabelSpan="true" emptySpanXL="0" emptySpanL="1"
+										emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1" singleContainerFullSize="false"/>
+								</f:layout>
+								<f:formContainers>
+									<f:FormContainer>
+										<f:formElements>
+											<f:FormElement label="{i18n>Equipment}">
+												<f:fields>
+													<Input value="{/Order/Equipment}" id="equnrInputOrd" required="true" valueHelpOnly="true" showValueHelp="true"
+														valueHelpRequest="handleEquipmentF4"/>
+												</f:fields>
+											</f:FormElement>
+											<f:FormElement label="{i18n>FL}">
+												<f:fields>
+													<Input value="{/Order/Funcloc}" editable="false"/>
+												</f:fields>
+											</f:FormElement>
+										</f:formElements>
+									</f:FormContainer>
+								</f:formContainers>
+							</f:Form>
+							<f:Form id="problemFormOrd" editable="true">
+								<f:title>
+									<core:Title text="{i18n>Problem}"/>
+								</f:title>
+								<f:layout>
+									<f:ResponsiveGridLayout labelSpanXL="4" labelSpanL="3" labelSpanM="3" labelSpanS="12" adjustLabelSpan="true" emptySpanXL="0" emptySpanL="1"
+										emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1" singleContainerFullSize="false"/>
+								</f:layout>
+								<f:formContainers>
+									<f:FormContainer>
+										<f:formElements>
+											<f:FormElement label="{i18n>Description}">
+												<f:fields>
+													<Input value="{/Order/Description}" id="descriptOrd"/>
+												</f:fields>
+											</f:FormElement>
+											<f:FormElement label="{i18n>NotifLongText}">
+												<f:fields>
+													<TextArea value="{/Order/LongText}" placeholder="{i18n>LongText}" growing="true" growingMaxLines="10" width="100%"/>
+												</f:fields>
+											</f:FormElement>
+											<f:FormElement label="{i18n>OrderType}">
+												<f:fields>
+													<Select forceSelection="false" selectedKey="{problType>/results/0/NotifType}" items="{ path: 'problType>/results' }">
+														<core:Item key="{problType>NotifType}" text="{problType>NotifTypeT}"/>
+													</Select>
+												</f:fields>
+											</f:FormElement>
+										</f:formElements>
+									</f:FormContainer>
+								</f:formContainers>
+							</f:Form>
+						</VBox>
+					</content>
+				</Page>
+				<Page id="planning" title="Work Center">
+					<content>
+						<ObjectHeader icon="sap-icon://eam-work-order" title="{i18n>title}" responsive="true" fullScreenOptimized="true" backgroundDesign="Solid"
+							class="createOrderPageHeader"></ObjectHeader>
+						<Toolbar class="toolBlue">
+							<Button class="roundClass" press="handleNavLeft" type="Accept" icon="sap-icon://arrow-left"></Button>
+							<ToolbarSpacer/>
+							<Text text="Planning" class="text-white"></Text>
+							<ToolbarSpacer/>
+							<Button class="roundClass" press="handleNavRight" type="Accept" icon="sap-icon://arrow-right"></Button>
+						</Toolbar>
+						<f:Form id="planningFormOrd" editable="true">
+							<f:title>
+								<core:Title text="{i18n>Planning}"/>
+							</f:title>
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanXL="4" labelSpanL="3" labelSpanM="3" labelSpanS="12" adjustLabelSpan="true" emptySpanXL="0" emptySpanL="1"
+									emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1" singleContainerFullSize="false"/>
+							</f:layout>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>PlannedDate}">
+											<f:fields>
+												<DatePicker id="PlDate"
+													value="{path: '/Order/PlannedDate', type : 'sap.ui.model.odata.type.DateTime', constraints : {displayFormat : 'Date'}}"
+													placeholder="Enter Date"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="Priority">
+											<f:fields>
+												<Select id="prioritySelect">
+													<core:Item key="4" text="Low"/>
+													<core:Item key="3" text="Medium"/>
+													<core:Item key="2" text="High"/>
+													<core:Item key="1" text="Very High"/>
+												</Select>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>WorkCenter}">
+											<f:fields>
+												<Input value="{/Order/WorkCenter}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="handleWcF4"/>
+												<Input value="{/Order/Werks} - {/Order/WorkCenterDescr}" editable="false"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+							</f:formContainers>
+						</f:Form>
+					</content>
+				</Page>
+				<Page id="task" title="Work Center">
+					<content>
+						<ObjectHeader icon="sap-icon://eam-work-order" title="{i18n>title}" responsive="true" fullScreenOptimized="true" backgroundDesign="Solid"
+							class="createOrderPageHeader"></ObjectHeader>
+						<Toolbar class="toolBlue">
+							<Button class="roundClass" press="handleNavLeft" type="Accept" icon="sap-icon://arrow-left"></Button>
+							<ToolbarSpacer/>
+							<Text text="Operations" class="text-white"></Text>
+							<ToolbarSpacer/>
+							<Button class="roundClass" press="handleNavRight" type="Accept" icon="sap-icon://arrow-right"></Button>
+						</Toolbar>
+						<Table id="operationsTable" items="{/Operations}" inset="false">
+							<headerToolbar>
+								<Toolbar>
+									<content>
+										<Title text="{i18n>Operations}" level="H2"/>
+										<ToolbarSpacer/>
+										<Button text="{i18n>AddTask}" icon="sap-icon://add" press="onOperationAdd"></Button>
+									</content>
+								</Toolbar>
+							</headerToolbar>
+							<columns>
+								<Column minScreenWidth="Tablet" demandPopin="true">
+									<Text text="{i18n>Operations}"/>
+								</Column>
+								<Column minScreenWidth="Desktop" demandPopin="true">
+									<Text text="{i18n>ActH}"/>
+								</Column>
+								<Column demandPopin="true" width="10%"></Column>
+							</columns>
+							<items>
+								<ColumnListItem vAlign="Middle">
+									<ObjectIdentifier title="{path: 'Description'}" text="{path: 'Activity'}"/>
+									<Label text="{path: 'DurationNormal'}"/>
+									<Button icon="sap-icon://sys-cancel" type="Transparent" press="removeOperationFromTable"></Button>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</content>
+				</Page>
+				<Page id="component" title="Work Center">
+					<content>
+						<ObjectHeader icon="sap-icon://eam-work-order" title="{i18n>title}" responsive="true" fullScreenOptimized="true" backgroundDesign="Solid"
+							class="createOrderPageHeader"></ObjectHeader>
+						<Toolbar class="toolBlue">
+							<Button class="roundClass" press="handleNavLeft" type="Accept" icon="sap-icon://arrow-left"></Button>
+							<ToolbarSpacer/>
+							<Text text="Components" class="text-white"></Text>
+							<ToolbarSpacer/>
+							<HBox width="3rem"></HBox>
+						</Toolbar>
+						<Table id="componentsTable" items="{/Components}" inset="false">
+							<headerToolbar>
+								<Toolbar>
+									<content>
+										<Title text="{i18n>Components}" level="H2"/>
+										<ToolbarSpacer/>
+										<Button text="{i18n>AddComponent}" press="onComponentAdd" icon="sap-icon://add"></Button>
+									</content>
+								</Toolbar>
+							</headerToolbar>
+							<columns>
+								<Column minScreenWidth="Tablet" demandPopin="true">
+									<Text text="{i18n>Components}"/>
+								</Column>
+								<Column minScreenWidth="Desktop" demandPopin="true" vAlign="Middle">
+									<Text text="{i18n>ReqQty}"/>
+								</Column>
+								<Column minScreenWidth="Desktop" demandPopin="true" vAlign="Middle">
+									<Text text="{i18n>Unit}"/>
+								</Column>
+								<Column vAlign="Middle">
+									<Text text="{i18n>Operation}"/>
+								</Column>
+								<Column vAlign="Middle" width="10%"></Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<ObjectIdentifier title="{MatlDesc}" text="{i18n>Material}"/>
+									<Label text="{i18n>ReqQty}"/>
+									<Label text="{i18n>ReqQtyU}"/>
+									<Label text="{Activity}"/>
+									<Button icon="sap-icon://sys-cancel" type="Transparent" press="removeComponentFromTable"></Button>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</content>
+				</Page>
+			</NavContainer>
+		</pages>
+	</App>
+</mvc:View>

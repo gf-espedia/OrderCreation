@@ -1,0 +1,35 @@
+{
+	"Order": {
+		"Equipment": "",
+		"Funcloc": "",
+		"Description": "",
+		"OrderType": "",
+		"Damage":"",
+		"DamageCode":"",
+		"DamageCodegrp":"",
+		"DamageText": "",
+		"CauseCode": "",
+		"CauseCodegrp": "",
+		"CauseText": "",
+		"Breakdown": false,
+		"MalfunctionStart": "",
+		"MalfunctionEnd": "",
+		"PlannedDate": "",
+		"Priority": "",
+		"WorkCenter": ""
+	},
+	
+	"Operations": [{
+		"Activity": "0010",
+		"Description": "TEST",
+		"DurationNormal": 4,
+		"ActivityType": "REPAIR"
+	}],
+	"Components": [{
+		"MatlDesc": "Componente 1",
+		"Material": "123456",
+		"RequirementQuantity": 4,
+		"UoM": "PZ",
+		"Activity": "0010"
+	}]
+}

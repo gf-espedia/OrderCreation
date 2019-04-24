@@ -1,0 +1,40 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:mvc="sap.ui.core.mvc" xmlns:c="sap.ui.commons"
+	xmlns:lay="sap.ui.layout" xmlns:f="sap.ui.layout.form">
+	<Dialog resizable="false" class="sapUiSizeCompact" title="{i18n>AddComponent}">
+		<buttons>
+			<Button text="{i18n>Ok}" press="onNewComponentConfirmPress" type="Accept"/>
+			<Button text="{i18n>Cancel}" press="onNewComponentCancelPress" type="Reject"/>
+		</buttons>
+		<content>
+			<Table id="newComponentsTable" items="{/NewComponents}" inset="false">
+				<columns>
+					<Column minScreenWidth="Tablet" demandPopin="true">
+						<Label required="true"  text="{i18n>Component}"/>
+					</Column>
+					<Column minScreenWidth="Tablet" demandPopin="true"></Column>
+					<Column minScreenWidth="Desktop" demandPopin="true" vAlign="Middle">
+						<Label required="true" text="{i18n>ReqQty}"/>
+					</Column>
+					<Column minScreenWidth="Desktop" demandPopin="true" vAlign="Middle">
+						<Label required="true" text="{i18n>Unit}"/>
+					</Column>
+					<Column vAlign="Middle">
+						<Label required="true" text="{i18n>Operation}"/>
+					</Column>
+					<Column vAlign="Middle" width="10%"></Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<Input value="{Material}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="handleMaterialF4" valueLiveUpdate="true"
+							liveChange="newCompLiveChange"/>
+						<Input value="{MatlDesc}" editable="false"/>
+						<Input value="{RequirementQuantity}" valueLiveUpdate="true" liveChange="newCompLiveChange"/>
+						<Input value="{RequirementQuantityUnit}" valueLiveUpdate="true" editable="false" liveChange="newCompLiveChange"/>
+						<Input value="{Activity}" valueLiveUpdate="true" liveChange="newCompLiveChange"/>
+						<Button icon="sap-icon://sys-cancel" type="Transparent"></Button>
+					</ColumnListItem>
+				</items>
+			</Table>
+		</content>
+	</Dialog>
+</core:FragmentDefinition>

@@ -1,0 +1,58 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form">
+	<Dialog title="{i18n>MaterialCodes}" contentWidth="70%" contentHeight="80%">
+		<content>
+			<VBox>
+				<VBox class="sapContrastPlus sapMOHR sapMOHRBgSolid">
+					<HBox wrap="Wrap">
+						<f:Form editable="true">
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanXL="4" labelSpanL="4" labelSpanM="4" labelSpanS="12" adjustLabelSpan="false" emptySpanXL="0" emptySpanL="0"
+									emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="2" columnsM="2" singleContainerFullSize="false"/>
+							</f:layout>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>MaterialNumber}">
+											<f:fields> 
+												<Input id="matnrSearchNum" submit="matnrDialogSearch"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>Description}">
+											<f:fields>
+												<Input id="matnrSearchDescr" submit="matnrDialogSearch"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>Plant}">
+											<f:fields>
+												<Input id="matnrSearchPlant" submit="matnrDialogSearch"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+							</f:formContainers>
+						</f:Form>
+					</HBox>
+					<Toolbar class=" sapUiSmallMarginTop">
+						<ToolbarSpacer/>
+						<Button text="{i18n>Clear}" press="matnrClearForm"/>
+						<Button text="{i18n>Search}" type="Emphasized" press="matnrDialogSearch"/>
+					</Toolbar>
+				</VBox>
+				<List id="matnrDialogList" items="{/MaterialSearchHelpSet}">
+					<StandardListItem iconInset="false" title="{{i18n>Matnr}" description="{Maktx}" type="Active" press="matnrDialogSelect"/>
+				</List>
+			</VBox>
+		</content>
+		<buttons>
+			<Button text="{i18n>Cancel}" press="matnrSearchDialogClose"/>
+		</buttons>
+	</Dialog>
+</core:FragmentDefinition>

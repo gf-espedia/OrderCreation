@@ -1,0 +1,32 @@
+/* Enter your custom styles here */
+
+
+/*@media (min-width: 1250px) {
+	.sapMShellCentralBox {
+		width: 100%!important;
+		margin-left: -50%!important;
+	}
+}*/
+
+.createOrderPageHeader .sapUiIcon {
+    color: #fabd64!important;
+}
+
+.openOrderPageHeader .sapUiIcon {
+    color: #91c8f6!important;
+}
+
+.toolBlue {
+    background-color: #3f5161;
+}
+
+.text-white {
+    color: white;
+    text-shadow: 0 0 0.125rem #000000;
+    font-size: 1rem;
+}
+
+.roundClass .sapMBtnInner{
+  border-radius:2rem;
+}
+
