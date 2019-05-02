@@ -2,14 +2,13 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
 	"sap/m/MessageBox"
 	//"com/espedia/demo/OrderCreation/controller/utils-old/SearchHelp"
-], function (Controller, MessageBox/*, SearchHelp*/) {
+], function (Controller, MessageBox /*, SearchHelp*/ ) {
 	"use strict";
 
 	//Il BaseController gestisce le funzioni di formattazione e SearchHelp
 
 	return Controller.extend("com.espedia.demo.OrderCreation.controller.BaseController", {
-		onInit: function () {
-		},
+		onInit: function () {},
 
 		// FORMATTAZIONE
 		_locale: null,
@@ -103,6 +102,9 @@ sap.ui.define([
 			var sPath = oEvent.getSource().getBindingContext().getPath();
 			var rowData = this.getView().getModel().getProperty(sPath);
 			this._orderModel.setProperty("/Order/Equipment", rowData.Equnr);
+			this._orderModel.setProperty("/Order/Funcloc", rowData.Tplnr);
+			this.getView().byId("equnrInputOrd").setValue(rowData.Equnr);
+			this.getView().byId("equnrInputTplnr").setValue(rowData.Tplnr);
 			this.eqSearchDialogClose();
 		},
 

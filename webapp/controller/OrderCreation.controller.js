@@ -13,7 +13,8 @@ sap.ui.define([
 	//test
 
 	var page = 0; //variabile globale conteggio pagine
-	var idPage = ["orderCreatePage", "planning", "task", "component"]; //id page array
+	var idPage = ["qrCode", "orderCreatePage", "planning", "task", "component"]; //id page array
+	var streamGlobal;
 
 	return BaseController.extend("com.espedia.demo.OrderCreation.controller.OrderCreation", {
 		onInit: function () {
@@ -341,30 +342,125 @@ sap.ui.define([
 
 		//navigation forward (right)
 		handleNavRight: function (evt) {
-			
-				page++;
-				if (page > 4) {
-					page = 4;
-				}
-				
-				this._openPage();
-			
+
+			page++;
+			if (page >= idPage.lenght) {
+				page = idPage.lenght - 1;
+			}
+
+			this._openPage();
+
 		},
 		//back navigation (left)
 		handleNavLeft: function (evt) {
-			
-				page--;
-				if(page < 0){
-					page = 0;
-				}
-				this._openPage();
-			
+
+			page--;
+			if (page < 0) {
+				page = 0;
+			}
+			this._openPage();
+
 		},
 		//open new page using th navigation container
 		_openPage: function () {
 			var app = this.getView().byId("navCon"); //pages are in the navConteiner
 			var selectedPage = this.byId(idPage[page]);
 			app.to(selectedPage, "show");
-		}
+		},
+
+		scanCode: function (oEvent) {
+				this.codeScanned = false;
+				var container = new sap.m.VBox({
+					"width": "512px",
+					"height": "384px"
+				});
+				var button = new sap.m.Button("", {
+					text: "Cancel",
+					type: "Reject",
+					press: function () {
+						dialog.close();
+					}
+				});
+				var dialog = new sap.m.Dialog({
+					title: "Scan Window",
+					content: [
+						container,
+						button
+					]
+				});
+				dialog.open();
+				var video = document.createElement("video");
+				video.id ="idVideo";
+				streamGlobal = video;				
+				video.autoplay = true;
+				var that = this;
+				qrcode.callback = function (data) {
+					if (data !== "error decoding QR Code") {
+						this.codeScanned = true;
+						that._oScannedInspLot = data;
+						//that.byId("datiScan").setValue(data); //gestione  dell'input da view
+
+						var oModel = that.getView().getModel();
+
+						oModel.setProperty("/data", data); //popola il singolo campo del modello. nel caso fosse un array data=[] --> usare il push (vedi app webCam)
+						oModel.refresh(true);
+						//MessageBox.alert(data);//Message Pops up for scanned Value
+						dialog.close();
+
+						try {
+							var equipRead = JSON.parse(data).Order.Equipment;
+							var funclocRead = JSON.parse(data).Order.Funcloc;
+						} catch {}
+						if (!equipRead || !funclocRead) {
+							MessageBox.alert(this.getView().getModel("i18n").getResourceBundle().getText("qrError"));
+						} else {
+							var app = this.getView().byId("navCon"); //pages are in the navConteiner
+							app.to(this.byId(idPage[1]), "show");
+							page = 1;
+							this._orderModel.setProperty("/Order/Equipment", equipRead);
+							this._orderModel.setProperty("/Order/Funcloc", funclocRead);
+							this.getView().byId("equnrInputOrd").setValue(equipRead);
+							this.getView().byId("equnrInputTplnr").setValue(funclocRead);
+						}
+
+					}
+				}.bind(this);
+
+				var canvas = document.createElement("canvas");
+				canvas.width = 512;
+				canvas.height = 384;
+				navigator.mediaDevices.getUserMedia({
+						audio: false,
+						video: {
+							facingMode: "environment",
+							width: {
+								ideal: 512
+							},
+							height: {
+								ideal: 384
+							}
+						}
+					})
+					.then(function (stream) {
+						video.srcObject = stream;
+						var ctx = canvas.getContext('2d');
+						var loop = (function () {
+							if (this.codeScanned) {
+								video.srcObject.getTracks()[0].stop();
+								return;
+							} else {
+								ctx.drawImage(video, 0, 0);
+								setTimeout(loop, 1000 / 30); // drawing at 30fps
+								qrcode.decode(canvas.toDataURL());
+							}
+						}.bind(this));
+						loop();
+					}.bind(this))
+					.catch(function (error) {
+						MessageBox.error("Unable to get Video Stream");
+					});
+
+				container.getDomRef().appendChild(canvas);
+			} //fine  scanCode
 	});
 });

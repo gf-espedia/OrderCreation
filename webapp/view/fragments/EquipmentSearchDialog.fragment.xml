@@ -47,7 +47,7 @@
 						<Button text="{i18n>Search}" type="Emphasized" press="equiDialogSearch"/>
 					</Toolbar>
 				</VBox>
-				<List id="equiDialogList" items="{/EquiSearchHelpSet}">
+				<List id="equiDialogList" items="{/EquipmentSearchHelpSet}">
 					<StandardListItem iconInset="false" title="{Equnr}" description="{Eqktx}" type="Active" press="equiDialogSelect"/>
 				</List>
 			</VBox>

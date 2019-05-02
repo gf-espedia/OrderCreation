@@ -3,12 +3,39 @@
 	<App id="idAppControl">
 		<pages>
 			<NavContainer id="navCon">
-				<Page id="orderCreatePage" title="Work Center">
+				<!--QrCode -->
+				<Page id="qrCode" title="Work Center">
 					<content>
 						<ObjectHeader icon="sap-icon://eam-work-order" title="{i18n>title}" responsive="true" fullScreenOptimized="true" backgroundDesign="Solid"
 							class="createOrderPageHeader"></ObjectHeader>
 						<Toolbar class="toolBlue">
 							<HBox width="3rem"></HBox>
+							<ToolbarSpacer/>
+							<Text text="QrCode" class="text-white"></Text>
+							<ToolbarSpacer/>
+							<Button class="roundClass" type="Accept" press="handleNavRight" icon="sap-icon://arrow-right"></Button>
+						</Toolbar>
+						<l:BlockLayoutCell class="sapUIResponsiveContentPadding" width="50%">
+							<VBox width="512px" id="container" alignItems="Center"/>
+							<Panel visible="true" expandable="false" width="auto">
+								<VBox alignItems="Center">
+									<Label/>
+									<Label text="" design="Bold"/>
+									<Label/>
+									<Button text="Scan" press="scanCode" icon="sap-icon://bar-code" width="100px" type="Accept"/>
+									<Label/>
+								</VBox>
+							</Panel>
+						</l:BlockLayoutCell>
+					</content>
+				</Page>
+				<!--QrCode -->
+				<Page id="orderCreatePage" title="Work Center">
+					<content>
+						<ObjectHeader icon="sap-icon://eam-work-order" title="{i18n>title}" responsive="true" fullScreenOptimized="true" backgroundDesign="Solid"
+							class="createOrderPageHeader"></ObjectHeader>
+						<Toolbar class="toolBlue">
+							<Button class="roundClass" type="Accept" press="handleNavLeft" icon="sap-icon://arrow-left"></Button>
 							<ToolbarSpacer/>
 							<Text text="Info" class="text-white"></Text>
 							<ToolbarSpacer/>
@@ -34,7 +61,7 @@
 											</f:FormElement>
 											<f:FormElement label="{i18n>FL}">
 												<f:fields>
-													<Input value="{/Order/Funcloc}" editable="false"/>
+													<Input id="equnrInputTplnr" value="{/Order/Funcloc}" editable="false"/>
 												</f:fields>
 											</f:FormElement>
 										</f:formElements>
@@ -67,6 +94,18 @@
 													<Select forceSelection="false" selectedKey="{problType>/results/0/NotifType}" items="{ path: 'problType>/results' }">
 														<core:Item key="{problType>NotifType}" text="{problType>NotifTypeT}"/>
 													</Select>
+												</f:fields>
+											</f:FormElement>
+											<f:FormElement label="{i18n>Damage}">
+												<f:fields>
+													<Input value="({DamageCodegrp} - {DamageCodegrp}) {DamageCodeDescr} " editable="false"/>
+													<Input value="{DamageText}" placeholder="Damage Description" editable="false"/>
+												</f:fields>
+											</f:FormElement>
+											<f:FormElement label="{i18n>Cause}">
+												<f:fields>
+													<Input value="({CauseCodegrp} - {CauseCode}) {CauseCodeDescr}" editable="false"/>
+													<Input value="{CauseText}" placeholder="Cause Description" editable="false"/>
 												</f:fields>
 											</f:FormElement>
 										</f:formElements>
