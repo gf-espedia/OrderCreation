@@ -7,19 +7,64 @@ sap.ui.define([
 	"jquery.sap.global",
 	"sap/ui/model/Filter",
 	"sap/ui/model/FilterOperator",
-	"sap/ui/model/json/JSONModel"
-], function (BaseController, MessageBox, jQuery, Filter, FilterOperator, JSONModel) {
+	"sap/ui/model/json/JSONModel",
+	//librerie aggiunte per collegamento alla webCam e allegati
+	"sap/m/UploadCollectionParameter",
+	"sap/m/MessageToast",
+	"sap/m/library",
+	"sap/ui/core/format/FileSizeFormat"
+
+], function (BaseController, MessageBox, jQuery, Filter, FilterOperator, JSONModel, UploadCollectionParameter, MessageToast,
+	MobileLibrary, FileSizeFormat) {
 	"use strict";
 	//test
 
 	var page = 0; //variabile globale conteggio pagine
-	var idPage = ["qrCode", "orderCreatePage", "planning", "task", "component"]; //id page array
+	var idPage = ["qrCode", "orderCreatePage", "planning", "task", "component", "attachmentCamera"]; //id page array
 	var streamGlobal;
+	var closeCamera = false;
 
 	return BaseController.extend("com.espedia.demo.OrderCreation.controller.OrderCreation", {
+		uploadJSON: {}, //allegati
 		onInit: function () {
 			this.mutableJSONOrdCreate = JSON.parse(JSON.stringify(this.orderCreationModel));
-			this._orderModel = new sap.ui.model.json.JSONModel(this.mutableJSONOrdCreate);
+			this._orderModel = new sap.ui.model.json.JSONModel(this.mutableJSONOrdCreate); //orderModel valido per l'intera app gestita con una pagina singola
+			this.getView().byId("attachmentCamera").setModel(this._orderModel); //attachments
+			this.getView().byId("cameraPage").setModel(new JSONModel({ //modello di default gestito da controller (alias empty model)
+				photos: []
+			})); //attachments
+			this.scanCode();
+
+			//attachments
+			this.getView().byId("attachmentCamera").setModel(new sap.ui.model.json.JSONModel({ //id: attachments -> attachmentCamera
+				"maximumFilenameLength": 80,
+				"maximumFileSize": 10,
+				"mode": MobileLibrary.ListMode.SingleSelectMaster,
+				"uploadEnabled": true,
+				"uploadButtonVisible": true,
+				"enableEdit": true,
+				"enableDelete": true,
+				"visibleEdit": true,
+				"visibleDelete": true,
+				"listSeparatorItems": [
+					MobileLibrary.ListSeparators.All,
+					MobileLibrary.ListSeparators.None
+				],
+				"showSeparators": MobileLibrary.ListSeparators.All,
+				"listModeItems": [{
+					"key": MobileLibrary.ListMode.SingleSelectMaster,
+					"text": "Single"
+				}, {
+					"key": MobileLibrary.ListMode.MultiSelect,
+					"text": "Multi"
+				}]
+			}), "attachSettings");
+
+			this.getView().byId("attachmentCamera").setModel(new sap.ui.model.json.JSONModel({ //id: attachments -> attachmentCamera
+				"items": ["jpg", "txt", "ppt", "pptx", "doc", "docx", "xls", "xlsx", "pdf", "png"],
+				"selected": ["jpg", "txt", "ppt", "pptx", "doc", "docx", "xls", "xlsx", "pdf", "png"]
+			}), "fileTypes");
+
 		},
 		//link per l'apertura del calendario
 		openCalendar: function () {
@@ -366,101 +411,414 @@ sap.ui.define([
 			var app = this.getView().byId("navCon"); //pages are in the navConteiner
 			var selectedPage = this.byId(idPage[page]);
 			app.to(selectedPage, "show");
+			if (page == 0) {
+				this.scanCode();
+			} 
+			else if (page == 2) {
+                this.getView().byId("PlantAndWC").setValue("1710 -" );
+			}
 		},
 
-		scanCode: function (oEvent) {
-				this.codeScanned = false;
-				var container = new sap.m.VBox({
-					"width": "512px",
-					"height": "384px"
-				});
-				var button = new sap.m.Button("", {
-					text: "Cancel",
-					type: "Reject",
-					press: function () {
-						dialog.close();
+		scanCode: function () {
+
+			var that = this;
+
+			this.codeScanned = false;
+			var container = new sap.m.VBox({
+				"width": "512px",
+				"height": "384px"
+			});
+			var button = new sap.m.Button("", {
+				text: "Cancel",
+				type: "Reject",
+				press: function () {
+					dialog.close();
+					that.closeCamera = true;
+				}
+			});
+			var dialog = new sap.m.Dialog({
+				title: "Scan Window",
+				content: [
+					container,
+					button
+				]
+			});
+			dialog.open();
+			var video = document.createElement("video");
+			video.id = "idVideo";
+			streamGlobal = video;
+			video.autoplay = true;
+			var that = this;
+			qrcode.callback = function (data) {
+				if (data !== "error decoding QR Code") {
+					this.codeScanned = true;
+					that._oScannedInspLot = data;
+					//that.byId("datiScan").setValue(data); //gestione  dell'input da view
+
+					var oModel = that.getView().getModel();
+
+					oModel.setProperty("/data", data); //popola il singolo campo del modello. nel caso fosse un array data=[] --> usare il push (vedi app webCam)
+					oModel.refresh(true);
+					//MessageBox.alert(data);//Message Pops up for scanned Value
+					dialog.close();
+
+					try {
+						var equipRead = JSON.parse(data).Order.Equipment;
+						//var funclocRead = JSON.parse(data).Order.Funcloc;
+					} catch {}
+					if (!equipRead /*|| !funclocRead*/ ) {
+						MessageBox.alert(this.getView().getModel("i18n").getResourceBundle().getText("qrError"));
+					} else {
+						var app = this.getView().byId("navCon"); //pages are in the navConteiner
+						app.to(this.byId(idPage[1]), "show");
+						page = 1;
+						this._orderModel.setProperty("/Order/Equipment", equipRead);
+						//this._orderModel.setProperty("/Order/Funcloc", funclocRead);
+						this.getView().byId("equnrInputOrd").setValue(equipRead);
+						//this.getView().byId("equnrInputTplnr").setValue(funclocRead);
+
+						//servizio per la functional location
+						var oModel = this.getView().getModel(); //dichiarazione del modello oModel, come modello di default
+						var sPath = "/EquipmentSearchHelpSet(Equnr='" + equipRead + "')";
+
+						oModel.read(sPath, {
+							"success": function (oData) {
+								this._orderModel.setProperty("/Order/Funcloc", oData.Tplnr);
+								this.getView().byId("equnrInputTplnr").setValue(oData.Tplnr);
+							}.bind(this),
+							"error": function (err) {
+								sap.m.MessageBox.error(err.message);
+							}
+						});
+						//fine chiamata servizio
+
 					}
-				});
-				var dialog = new sap.m.Dialog({
-					title: "Scan Window",
-					content: [
-						container,
-						button
-					]
-				});
-				dialog.open();
-				var video = document.createElement("video");
-				video.id ="idVideo";
-				streamGlobal = video;				
-				video.autoplay = true;
-				var that = this;
-				qrcode.callback = function (data) {
-					if (data !== "error decoding QR Code") {
-						this.codeScanned = true;
-						that._oScannedInspLot = data;
-						//that.byId("datiScan").setValue(data); //gestione  dell'input da view
 
-						var oModel = that.getView().getModel();
+				}
+			}.bind(this);
 
-						oModel.setProperty("/data", data); //popola il singolo campo del modello. nel caso fosse un array data=[] --> usare il push (vedi app webCam)
-						oModel.refresh(true);
-						//MessageBox.alert(data);//Message Pops up for scanned Value
-						dialog.close();
-
-						try {
-							var equipRead = JSON.parse(data).Order.Equipment;
-							var funclocRead = JSON.parse(data).Order.Funcloc;
-						} catch {}
-						if (!equipRead || !funclocRead) {
-							MessageBox.alert(this.getView().getModel("i18n").getResourceBundle().getText("qrError"));
+			var canvas = document.createElement("canvas");
+			canvas.width = 512;
+			canvas.height = 384;
+			navigator.mediaDevices.getUserMedia({
+					audio: false,
+					video: {
+						facingMode: "environment",
+						width: {
+							ideal: 512
+						},
+						height: {
+							ideal: 384
+						}
+					}
+				})
+				.then(function (stream) {
+					video.srcObject = stream;
+					var ctx = canvas.getContext('2d');
+					var loop = (function () {
+						if (this.codeScanned || that.closeCamera) {
+							video.srcObject.getTracks()[0].stop();
+							that.closeCamera = false;
+							return;
 						} else {
-							var app = this.getView().byId("navCon"); //pages are in the navConteiner
-							app.to(this.byId(idPage[1]), "show");
-							page = 1;
-							this._orderModel.setProperty("/Order/Equipment", equipRead);
-							this._orderModel.setProperty("/Order/Funcloc", funclocRead);
-							this.getView().byId("equnrInputOrd").setValue(equipRead);
-							this.getView().byId("equnrInputTplnr").setValue(funclocRead);
+							ctx.drawImage(video, 0, 0);
+							setTimeout(loop, 1000 / 30); // drawing at 30fps
+							qrcode.decode(canvas.toDataURL());
 						}
+					}.bind(this));
+					loop();
+				}.bind(this))
+				.catch(function (error) {
+					MessageBox.error("Unable to get Video Stream");
+				});
 
+			container.getDomRef().appendChild(canvas);
+		},
+		//fine  scanCode
+
+		// START FILE UPLOADER   
+		formatAttribute: function (sValue) {
+			if (jQuery.isNumeric(sValue)) {
+				return FileSizeFormat.getInstance({
+					binaryFilesize: false,
+					maxFractionDigits: 1,
+					maxIntegerDigits: 3
+				}).format(sValue);
+			} else {
+				return sValue;
+			}
+		},
+
+		arrayJSONStringify: function (array) {
+			for (var i = 0; i < array.length; i++) {
+				if (typeof array[i] !== "string") {
+					array[i] = JSON.stringify(array[i]);
+				}
+			}
+			return array;
+		},
+
+		arrayJSONParse: function (array) {
+			for (var i = 0; i < array.length; i++) {
+				array[i] = JSON.parse(array[i]);
+			}
+			return array;
+		},
+
+		onChange: function (oEvent) {
+			var that = this;
+			var oUploadCollection = oEvent.getSource();
+			// Header Token
+			var oCustomerHeaderToken = new UploadCollectionParameter({
+				name: "x-csrf-token",
+				value: "securityTokenFromModel"
+			});
+			oUploadCollection.addHeaderParameter(oCustomerHeaderToken);
+
+			var reader = new FileReader();
+			var file = oEvent.getParameter("files")[0];
+			that.uploadJSON = {};
+			that.uploadJSON.fileId = jQuery.now().toString();
+			that.uploadJSON.fileName = file.name;
+			that.uploadJSON.fileMimeType = file.type;
+			that.uploadJSON.fileDimension = (file.size / 1000).toFixed(2) + " kB";
+			that.uploadJSON.fileExtension = file.name.split(".")[1];
+			that.uploadJSON.fileUploadDate = new Date(jQuery.now()).toLocaleDateString();
+			reader.onload = function (e) {
+				that.uploadJSON.fileContent = e.target.result.substring(5 + that.uploadJSON.fileMimeType.length + 8);
+			};
+
+			reader.onerror = function (e) {
+				sap.m.MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("errUpl"));
+			};
+
+			reader.readAsDataURL(file);
+
+		},
+
+		base64toBlob: function (base64Data, contentType) {
+			contentType = contentType || '';
+			var sliceSize = 1024;
+			var byteCharacters = atob(base64Data);
+			var bytesLength = byteCharacters.length;
+			var slicesCount = Math.ceil(bytesLength / sliceSize);
+			var byteArrays = new Array(slicesCount);
+
+			for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+				var begin = sliceIndex * sliceSize;
+				var end = Math.min(begin + sliceSize, bytesLength);
+				var bytes = new Array(end - begin);
+
+				for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+					bytes[i] = byteCharacters[offset].charCodeAt(0);
+				}
+
+				byteArrays[sliceIndex] = new Uint8Array(bytes);
+			}
+
+			return new Blob(byteArrays, {
+				type: contentType
+			});
+		},
+
+		onFileDeleted: function (oEvent) {
+			this.deleteItemById(oEvent.getParameter("documentId"));
+		},
+
+		deleteItemById: function (sItemToDeleteId) {
+			var oData = this.byId("attachmentCamera").getModel().getData(); //id: attachments -> attachmentCamera
+			var aItems = jQuery.extend(true, {}, oData)["Attachments"];
+			jQuery.each(aItems, function (index) {
+				if (aItems[index] && aItems[index].fileId === sItemToDeleteId) {
+					aItems.splice(index, 1);
+				}
+			});
+			this.byId("attachmentCamera").getModel().getData()["Attachments"] = aItems; //id: attachments -> attachmentCamera
+			this.byId("attachmentCamera").getModel().refresh(); //id: attachments -> attachmentCamera
+
+			this.byId("attachmentTitle").setText(this.getAttachmentTitleText());
+		},
+
+		onFilenameLengthExceed: function () {
+			MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileLenghtExc"));
+		},
+
+		onFileRenamed: function (oEvent) {
+			var oData = this.byId("attachmentCamera").getModel().getData(); //id: attachments -> attachmentCamera
+			var aItems = jQuery.extend(true, {}, oData)["Attachments"];
+			var sDocumentId = oEvent.getParameter("documentId");
+			jQuery.each(aItems, function (index) {
+				if (aItems[index] && aItems[index].fileId === sDocumentId) {
+					aItems[index].fileName = oEvent.getParameter("item").getFileName();
+				}
+			});
+			this.byId("attachmentCamera").getModel().getData()["Attachments"] = aItems; //id: attachments -> attachmentCamera
+			this.byId("attachmentCamera").getModel().refresh(); //id: attachments -> attachmentCamera
+		},
+
+		onFileSizeExceed: function () {
+			MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("fileSizeExc"));
+		},
+
+		onTypeMissmatch: function () {
+			MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("typeMiss"));
+		},
+
+		onUploadComplete: function () {
+			var that = this;
+			var oData = this.byId("attachmentCamera").getModel().getData(); //id: attachments -> attachmentCamera
+
+			var blobForURL = this.base64toBlob(that.uploadJSON.fileContent, that.uploadJSON.fileMimeType);
+			var fileURL = URL.createObjectURL(blobForURL);
+			oData["Attachments"].unshift({
+				"fileId": that.uploadJSON.fileId,
+				"fileName": that.uploadJSON.fileName,
+				"fileMimeType": that.uploadJSON.fileMimeType,
+				"fileDimension": that.uploadJSON.fileDimension,
+				"fileExtension": that.uploadJSON.fileExtension,
+				"fileUploadDate": that.uploadJSON.fileUploadDate,
+				"fileContent": that.uploadJSON.fileContent,
+				"fileThumbnailUrl": "",
+				"fileURL": fileURL,
+				"attributes": [{
+					"title": "Data di caricamento",
+					"text": that.uploadJSON.fileUploadDate,
+					"active": false
+				}, {
+					"title": "Dimensione",
+					"text": that.uploadJSON.fileDimension,
+					"active": false
+				}],
+				"selected": false
+			});
+			this.byId("attachmentCamera").getModel().refresh(); //id: attachments -> attachmentCamera
+			that.uploadJSON = {};
+
+			// Sets the text to the label
+			this.byId("attachmentTitle").setText(this.getAttachmentTitleText());
+		},
+
+		onBeforeUploadStarts: function (oEvent) {
+			// Header Slug
+			var oCustomerHeaderSlug = new UploadCollectionParameter({
+				name: "slug",
+				value: oEvent.getParameter("fileName")
+			});
+			oEvent.getParameters().addHeaderParameter(oCustomerHeaderSlug);
+		},
+
+		onSelectAllPress: function (oEvent) {
+			var oUploadCollection = this.byId("attachments"); //CONTROLLARE QUESTO ID!!! DOVREBBE ESSERE RELATIVO ALL'UPLOAD COLLECTION
+			if (!oEvent.getSource().getPressed()) {
+				this.deselectAllItems(oUploadCollection);
+				oEvent.getSource().setPressed(false);
+				oEvent.getSource().setText("Select all");
+			} else {
+				this.deselectAllItems(oUploadCollection);
+				oUploadCollection.selectAll();
+				oEvent.getSource().setPressed(true);
+				oEvent.getSource().setText("Deselect all");
+			}
+			this.onSelectionChange(oEvent);
+		},
+
+		deselectAllItems: function (oUploadCollection) {
+			var aItems = oUploadCollection.getItems();
+			for (var i = 0; i < aItems.length; i++) {
+				oUploadCollection.setSelectedItem(aItems[i], false);
+			}
+		},
+
+		getAttachmentTitleText: function () {
+			var aItems = this.byId("attachments").getItems(); //id: attachments -> attachmentCamera
+			var nAllegati = this.getView().getModel("i18n").getResourceBundle().getText("Nallegati"); //i18n gestito con variabile dinamica
+			nAllegati = nAllegati.replace("%var%", aItems.length);
+
+			return nAllegati;
+		},
+
+		onModeChange: function (oEvent) {
+			var oSettingsModel = this.getView().getModel("attachSettings");
+			if (oEvent.getParameters().selectedItem.getProperty("key") === MobileLibrary.ListMode.MultiSelect) {
+				oSettingsModel.setProperty("/visibleEdit", false);
+				oSettingsModel.setProperty("/visibleDelete", false);
+				this.enableToolbarItems(true);
+			} else {
+				oSettingsModel.setProperty("/visibleEdit", true);
+				oSettingsModel.setProperty("/visibleDelete", true);
+				this.enableToolbarItems(false);
+			}
+		},
+
+		onSelectionChange: function () {
+			var oData = this.byId("attachmentCamera").getModel().getData(); //id: attachments -> attachmentCamera
+			var aSelectedItems = this.byId("attachments").getSelectedItems(); //id: attachments -> attachmentCamera
+			if (aSelectedItems.length !== 0) {
+				var selectedItemId = aSelectedItems[0].getDocumentId();
+				var attach = oData["Attachments"];
+				for (var k in attach) {
+					if (attach[k].selected === true && attach[k].fileId !== selectedItemId) {
+						attach[k].selected = false;
 					}
-				}.bind(this);
+				}
+			}
+		},
 
-				var canvas = document.createElement("canvas");
-				canvas.width = 512;
-				canvas.height = 384;
-				navigator.mediaDevices.getUserMedia({
-						audio: false,
-						video: {
-							facingMode: "environment",
-							width: {
-								ideal: 512
-							},
-							height: {
-								ideal: 384
-							}
-						}
-					})
-					.then(function (stream) {
-						video.srcObject = stream;
-						var ctx = canvas.getContext('2d');
-						var loop = (function () {
-							if (this.codeScanned) {
-								video.srcObject.getTracks()[0].stop();
-								return;
-							} else {
-								ctx.drawImage(video, 0, 0);
-								setTimeout(loop, 1000 / 30); // drawing at 30fps
-								qrcode.decode(canvas.toDataURL());
-							}
-						}.bind(this));
-						loop();
-					}.bind(this))
-					.catch(function (error) {
-						MessageBox.error("Unable to get Video Stream");
-					});
+		onDownloadSelectedItems: function () {
+			var oData = this.byId("attachmentCamera").getModel().getData(); //id: attachments -> attachmentCamera
+			var aItems = jQuery.extend(true, {}, oData)["Attachments"];
+			var aSelectedItems = this.byId("attachments").getSelectedItems(); //id: attachments -> attachmentCamera
+			if (aSelectedItems.length !== 0) {
+				var downloadableContent;
+				jQuery.each(aItems, function (index) {
+					if (aItems[index] && aItems[index].fileId === aSelectedItems[0].getDocumentId()) {
+						downloadableContent = aItems[index];
+					}
+				});
+				var blob = this.base64toBlob(downloadableContent.fileContent, downloadableContent.fileMimeType);
+				var objectURL = URL.createObjectURL(blob);
 
-				container.getDomRef().appendChild(canvas);
-			} //fine  scanCode
+				var link = document.createElement('a');
+				link.style.display = 'none';
+				document.body.appendChild(link);
+
+				link.href = objectURL;
+				link.href = URL.createObjectURL(blob);
+				link.download = downloadableContent.fileName;
+				link.click();
+			}
+		},
+
+		// END FILE UPLOADER 
+
+		//collegamento all'app della webCam
+
+		onCameraOpen: function () { //controllare l'ordine degli id
+				var app = this.byId("idAppControl");
+				var page = this.byId("cameraPage");
+				app.to(page, "show");
+				var oCamera = this.getView().byId("idCamera");
+				if (!firstOpenCamera) oCamera.rerender();
+				firstOpenCamera = false;
+				/*if(page.getId()!=="__component0---OrderCreation--cameraPage"){
+					oCamera.stopCamera();
+				}else{
+					oCamera.rerender();
+				}*/
+				
+			},
+			//fine collegamento all'app della webCam
+
+		//metodo per tornare alla view degli allegati. Inserito nel CameraController (anche qui funziona)
+
+		onBackToApp: function () {
+			var app = this.getView().byId("idAppControl");		
+			var page = this.getView().byId("navCon");
+			var oCamera = this.getView().byId("idCamera");
+			oCamera.stopCamera();
+			app.to(page, "show");
+
+		}
+
 	});
 });

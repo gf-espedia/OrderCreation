@@ -1,5 +1,6 @@
 <mvc:View controllerName="com.espedia.demo.OrderCreation.controller.OrderCreation" xmlns:html="http://www.w3.org/1999/xhtml"
-	xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:core="sap.ui.core">
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:l="sap.ui.layout" xmlns:f="sap.ui.layout.form" xmlns:core="sap.ui.core"
+	xmlns:lab="openui5.camera">
 	<App id="idAppControl">
 		<pages>
 			<NavContainer id="navCon">
@@ -28,6 +29,11 @@
 							</Panel>
 						</l:BlockLayoutCell>
 					</content>
+					<footer>
+						<Toolbar>
+							<Button text="Planning Calendar" press="openCalendar" type="Emphasized" icon="sap-icon://calendar"></Button>
+						</Toolbar>
+					</footer>
 				</Page>
 				<!--QrCode -->
 				<Page id="orderCreatePage" title="Work Center">
@@ -98,14 +104,14 @@
 											</f:FormElement>
 											<f:FormElement label="{i18n>Damage}">
 												<f:fields>
-													<Input value="({DamageCodegrp} - {DamageCodegrp}) {DamageCodeDescr} " editable="false"/>
-													<Input value="{DamageText}" placeholder="Damage Description" editable="false"/>
+													<Input value="({DamageCodegrp} - {DamageCodegrp}) {DamageCodeDescr} " editable="true"/>
+													<Input value="{DamageText}" placeholder="Damage Description" editable="true"/>
 												</f:fields>
 											</f:FormElement>
 											<f:FormElement label="{i18n>Cause}">
 												<f:fields>
-													<Input value="({CauseCodegrp} - {CauseCode}) {CauseCodeDescr}" editable="false"/>
-													<Input value="{CauseText}" placeholder="Cause Description" editable="false"/>
+													<Input value="({CauseCodegrp} - {CauseCode}) {CauseCodeDescr}" editable="true"/>
+													<Input value="{CauseText}" placeholder="Cause Description" editable="true"/>
 												</f:fields>
 											</f:FormElement>
 										</f:formElements>
@@ -114,6 +120,11 @@
 							</f:Form>
 						</VBox>
 					</content>
+					<footer>
+						<Toolbar>
+							<Button text="Planning Calendar" press="openCalendar" type="Emphasized" icon="sap-icon://calendar"></Button>
+						</Toolbar>
+					</footer>
 				</Page>
 				<Page id="planning" title="Work Center">
 					<content>
@@ -156,8 +167,8 @@
 										</f:FormElement>
 										<f:FormElement label="{i18n>WorkCenter}">
 											<f:fields>
-												<Input value="{/Order/WorkCenter}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="handleWcF4"/>
-												<Input value="{/Order/Werks} - {/Order/WorkCenterDescr}" editable="false"/>
+												<Input id="InputWC" value="{/Order/WorkCenter}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="handleWcF4"/>
+												<Input id="PlantAndWC" value="{/Order/Werks} - {/Order/WorkCenterDescr}" editable="false"/>
 											</f:fields>
 										</f:FormElement>
 									</f:formElements>
@@ -165,6 +176,11 @@
 							</f:formContainers>
 						</f:Form>
 					</content>
+					<footer>
+						<Toolbar>
+							<Button text="Planning Calendar" press="openCalendar" type="Emphasized" icon="sap-icon://calendar"></Button>
+						</Toolbar>
+					</footer>
 				</Page>
 				<Page id="task" title="Work Center">
 					<content>
@@ -205,6 +221,11 @@
 							</items>
 						</Table>
 					</content>
+					<footer>
+						<Toolbar>
+							<Button text="Planning Calendar" press="openCalendar" type="Emphasized" icon="sap-icon://calendar"></Button>
+						</Toolbar>
+					</footer>
 				</Page>
 				<Page id="component" title="Work Center">
 					<content>
@@ -215,7 +236,7 @@
 							<ToolbarSpacer/>
 							<Text text="Components" class="text-white"></Text>
 							<ToolbarSpacer/>
-							<HBox width="3rem"></HBox>
+							<Button class="roundClass" type="Accept" press="handleNavRight" icon="sap-icon://arrow-right"></Button>
 						</Toolbar>
 						<Table id="componentsTable" items="{/Components}" inset="false">
 							<headerToolbar>
@@ -253,8 +274,67 @@
 							</items>
 						</Table>
 					</content>
+					<footer>
+						<Toolbar>
+							<Button text="Planning Calendar" press="openCalendar" type="Emphasized" icon="sap-icon://calendar"></Button>
+						</Toolbar>
+					</footer>
+				</Page>
+				<!-- attachments-->
+				<Page id="attachmentCamera" title="Work Center">
+					<content>
+						<ObjectHeader icon="sap-icon://eam-work-order" title="{i18n>title}" responsive="true" fullScreenOptimized="true" backgroundDesign="Solid"
+							class="createOrderPageHeader"></ObjectHeader>
+						<Toolbar class="toolBlue">
+							<Button class="roundClass" press="handleNavLeft" type="Accept" icon="sap-icon://arrow-left"></Button>
+							<ToolbarSpacer/>
+							<Text text="Attachments" class="text-white"></Text>
+							<ToolbarSpacer/>
+							<Button class="roundClass" type="Accept" icon="sap-icon://accept" tooltip="Create order"></Button>
+						</Toolbar>
+						<UploadCollection id="attachments" maximumFilenameLength="{attachSettings>/maximumFilenameLength}"
+							maximumFileSize="{attachSettings>/maximumFileSize}" multiple="true" change="onChange" fileDeleted="onFileDeleted"
+							filenameLengthExceed="onFilenameLengthExceed" fileRenamed="onFileRenamed" fileSizeExceed="onFileSizeExceed" fileType="{fileTypes>/selected}"
+							selectionChange="onSelectionChange" typeMissmatch="onTypeMissmatch" uploadComplete="onUploadComplete"
+							beforeUploadStarts="onBeforeUploadStarts" uploadTerminated="onUploadTerminated" items="{ path: '/Attachments', templateShareable: false }"
+							numberOfAttachmentsText="" showSeparators="{attachSettings>/showSeparators}" uploadEnabled="{attachSettings>/uploadEnabled}"
+							uploadButtonInvisible="{=!${attachSettings>/uploadButtonVisible}}" mode="{attachSettings>/mode}">
+							<toolbar>
+								<OverflowToolbar id="attachToolbar">
+									<Title id="attachmentTitle"/>
+									<ToolbarSpacer/>
+									<!--<Button id="attachDeleteSelectedButton" text="Delete" press="onDeleteSelectedItems" enabled="false" visible="false"
+								type="Transparent"/>
+							<ToggleButton id="attachSelectAllButton" text="Select all" press="onSelectAllPress" enabled="false" visible="false"
+								type="Transparent"/>-->
+									<Button id="attachDownloadSelectedButton" icon="sap-icon://download" press="onDownloadSelectedItems" enabled="true" visible="true"
+										type="Transparent"/>
+									<!--<Button id="qrcodeReaderOpen" icon="sap-icon://bar-code" press="test" tooltip ="{i18n>qrcode}" enabled="true" visible="true"
+								type="Transparent"/>-->
+									<Button id="cameraOpen" icon="sap-icon://add-photo" press="onCameraOpen" enabled="true" visible="true" type="Transparent"/>
+									<UploadCollectionToolbarPlaceholder/>
+								</OverflowToolbar>
+							</toolbar>
+							<items>
+								<UploadCollectionItem documentId="{fileId}" fileName="{fileName}" mimeType="{fileMimeType}" thumbnailUrl="{fileThumbnailUrl}"
+									url="{fileURL}" enableEdit="{attachSettings>/enableEdit}" enableDelete="{attachSettings>/enableDelete}"
+									visibleDelete="{attachSettings>/visibleDelete}" visibleEdit="{attachSettings>/visibleEdit}"
+									attributes="{path : 'attributes', templateShareable : false}" selected="{selected}">
+									<attributes>
+										<ObjectAttribute title="{title}" text="{path : 'text', formatter : '.formatAttribute'}" active="{active}" press="onAttributePress"/>
+									</attributes>
+								</UploadCollectionItem>
+							</items>
+						</UploadCollection>
+					</content>
+					<footer>
+						<Toolbar>
+							<Button text="Planning Calendar" press="openCalendar" type="Emphasized" icon="sap-icon://calendar"></Button>
+						</Toolbar>
+					</footer>
 				</Page>
 			</NavContainer>
+			<core:Fragment fragmentName="com.espedia.demo.OrderCreation.view.pages.Camera" type="XML"/>
 		</pages>
 	</App>
 </mvc:View>

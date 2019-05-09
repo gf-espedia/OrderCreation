@@ -52,7 +52,8 @@
 			"libs": {
 				"sap.ui.layout": {},
 				"sap.ui.core": {},
-				"sap.m": {}
+				"sap.m": {},
+				"openui5.camera": {}
 			}
 		},
 		"contentDensities": {
@@ -78,12 +79,10 @@
 			}
 		},
 		"resources": {
-			"css": [
-				{
-					"uri": "css/style.css"
-				}
-			],
-				"js": [{
+			"css": [{
+				"uri": "css/style.css"
+			}],
+			"js": [{
 				"uri": "js/grid.js"
 			}, {
 				"uri": "js/version.js"
@@ -119,6 +118,9 @@
 				"uri": "js/databr.js"
 			}]
 		},
+		"resourceRoots": {
+			"openui5.camera": "./utils/openui5/camera/"
+		},
 		"routing": {
 			"config": {
 				"routerClass": "sap.m.routing.Router",
@@ -129,15 +131,13 @@
 				"controlId": "app",
 				"clearControlAggregation": false
 			},
-			"routes": [
-				{
-					"name": "RouteOrderCreation",
-					"pattern": "RouteOrderCreation",
-					"target": [
-						"TargetOrderCreation"
-					]
-				}
-			],
+			"routes": [{
+				"name": "RouteOrderCreation",
+				"pattern": "RouteOrderCreation",
+				"target": [
+					"TargetOrderCreation"
+				]
+			}],
 			"targets": {
 				"TargetOrderCreation": {
 					"viewType": "XML",

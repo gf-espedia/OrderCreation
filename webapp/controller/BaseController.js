@@ -1,13 +1,14 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-	"sap/m/MessageBox"
+	"sap/m/MessageBox",
+	"com/espedia/demo/OrderCreation/controller/CameraController"
 	//"com/espedia/demo/OrderCreation/controller/utils-old/SearchHelp"
-], function (Controller, MessageBox /*, SearchHelp*/ ) {
+], function (Controller, MessageBox, CameraController /*, SearchHelp*/ ) {
 	"use strict";
 
 	//Il BaseController gestisce le funzioni di formattazione e SearchHelp
 
-	return Controller.extend("com.espedia.demo.OrderCreation.controller.BaseController", {
+	return CameraController.extend("com.espedia.demo.OrderCreation.controller.BaseController", {
 		onInit: function () {},
 
 		// FORMATTAZIONE
@@ -84,6 +85,7 @@ sap.ui.define([
 		// HELP DI RICERCA
 
 		equiDialogSearch: function () {
+			sap.ui.getCore().byId("eqSearchPlant").setValue("1710").setEditable(false);			
 			var equnr = sap.ui.getCore().byId("eqSearchNum").getValue();
 			var descr = sap.ui.getCore().byId("eqSearchDescr").getValue();
 			var plant = sap.ui.getCore().byId("eqSearchPlant").getValue();
@@ -195,7 +197,8 @@ sap.ui.define([
 
 		wcDialogSearch: function () {
 			var wc = sap.ui.getCore().byId("wcSearchWorkCenter").getValue();
-			var descr = sap.ui.getCore().byId("wcSearchDesciption").getValue();
+            var descr = sap.ui.getCore().byId("wcSearchDesciption").getValue();
+            sap.ui.getCore().byId("wcSearchPlant").setValue("1710");
 			var plant = sap.ui.getCore().byId("wcSearchPlant").getValue();
 			//var langu = sap.ui.getCore().byId("eqSearchLangu").getValue();
 			var aFilters = [
@@ -213,6 +216,8 @@ sap.ui.define([
 			this._orderModel.setProperty("/Order/WorkCenter", rowData.Arbpl);
 			this._orderModel.setProperty("/Order/WorkCenterDescr", rowData.Ktext);
 			this.wcSearchDialogClose();
+            this.getView().byId("InputWC").setValue(rowData.Arbpl);
+            this.getView().byId("PlantAndWC").setValue(rowData.Werks + " - " + rowData.Ktext);
 		},
 
 		wcClearForm: function () {
@@ -284,7 +289,8 @@ sap.ui.define([
 			},
 
 			"Operations": [],
-			"Components": []
+			"Components": [],
+			"Attachments": []
 		},
 
 		addComponentModel: {

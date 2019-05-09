@@ -31,5 +31,6 @@
 		"RequirementQuantity": 4,
 		"UoM": "PZ",
 		"Activity": "0010"
-	}]
+	}],
+	"Attachments": []
 }

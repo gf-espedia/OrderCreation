@@ -1,0 +1,36 @@
+<core:FragmentDefinition xmlns:html="http://www.w3.org/1999/xhtml" xmlns:mvc="sap.ui.core.mvc" xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form" xmlns:lab="openui5.camera" xmlns:core="sap.ui.core" xmlns="sap.m" controllerName="Camera.controller.Home"
+	displayBlock="true">
+	<Page id="cameraPage" title="Camera" showNavButton="true" navButtonPress="onBackToApp">
+		<content>
+			<ObjectHeader backgroundDesign="Solid" number="{/photos/length}" numberUnit="photos"></ObjectHeader>
+			<l:DynamicSideContent class="sapUiDSCExplored sapUiContentPadding" sideContentFallDown="BelowM" containerQuery="true" showSideContent="true">
+				<l:mainContent>
+					<lab:Camera id="idCamera" width="800" height="600" snapshot=".onSnapshot" singleShotMode="false"/>
+				</l:mainContent>
+				<l:sideContent>
+					<FlexBox alignItems="Start">
+						<items>
+							<List headerText="{i18n>Foto}" growing="false" items="{ path: '/photos' }" noDataText="{i18n>nophotos}" width="auto" id="listPhoto"
+								mode="SingleSelectMaster">
+								<layoutData>
+									<FlexItemData growFactor="1"/>
+								</layoutData>
+								<items>
+									<CustomListItem type="Active">
+										<Image src="{src}" densityAware="false" height="100px"></Image>
+										<Button id="decline" icon="sap-icon://decline" press="deletePhotos" type="Transparent" visible="true"/>
+									</CustomListItem>
+								</items>
+							</List>
+							<Button id="downloadSelected" icon="sap-icon://download" press="onDownloadSelectedItems" enabled="true" type="Default" visible="true"
+								class="sapUiSmallMarginEnd">
+								<layoutData></layoutData>
+							</Button>
+						</items>
+					</FlexBox>
+				</l:sideContent>
+			</l:DynamicSideContent>
+		</content>
+	</Page>
+</core:FragmentDefinition>
