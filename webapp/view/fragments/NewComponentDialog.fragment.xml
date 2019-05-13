@@ -7,6 +7,7 @@
 		</buttons>
 		<content>
 			<Table id="newComponentsTable" items="{/NewComponents}" inset="false">
+				
 				<columns>
 					<Column minScreenWidth="Tablet" demandPopin="true">
 						<Label required="true"  text="{i18n>Component}"/>
@@ -33,6 +34,15 @@
 						<Input value="{Activity}" valueLiveUpdate="true" liveChange="newCompLiveChange"/>
 						<Button icon="sap-icon://sys-cancel" type="Transparent"></Button>
 					</ColumnListItem>
+					<!--<ColumnListItem>-->
+					<!--	<Input value="{path: Material}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="handleMaterialF4" valueLiveUpdate="true"-->
+					<!--		liveChange="newCompLiveChange"/>-->
+					<!--	<Input value="{path: 'MatlDesc'}" editable="false"/>-->
+					<!--	<Input value="{path: 'RequirementQuantity'}" valueLiveUpdate="true" liveChange="newCompLiveChange"/>-->
+					<!--	<Input value="{path: 'RequirementQuantityUnit'}" valueLiveUpdate="true" editable="false" liveChange="newCompLiveChange"/>-->
+					<!--	<Input value="{path: 'Activity'}" valueLiveUpdate="true" liveChange="newCompLiveChange"/>-->
+					<!--	<Button icon="sap-icon://sys-cancel" type="Transparent"></Button>-->
+					<!--</ColumnListItem>-->
 				</items>
 			</Table>
 		</content>

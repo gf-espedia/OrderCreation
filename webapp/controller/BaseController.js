@@ -141,7 +141,10 @@ sap.ui.define([
 		matnrDialogSearch: function () {
 			var matnr = sap.ui.getCore().byId("matnrSearchNum").getValue();
 			var descr = sap.ui.getCore().byId("matnrSearchDescr").getValue();
+			
+			sap.ui.getCore().byId("matnrSearchPlant").setValue("1710").setEditable(false);
 			var plant = sap.ui.getCore().byId("matnrSearchPlant").getValue();
+			
 			//var langu = sap.ui.getCore().byId("eqSearchLangu").getValue();
 			var aFilters = [
 				new sap.ui.model.Filter("Matnr", sap.ui.model.FilterOperator.Contains, matnr),

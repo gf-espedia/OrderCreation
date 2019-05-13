@@ -193,7 +193,7 @@
 							<ToolbarSpacer/>
 							<Button class="roundClass" press="handleNavRight" type="Accept" icon="sap-icon://arrow-right"></Button>
 						</Toolbar>
-						<Table id="operationsTable" items="{/Operations}" inset="false">
+						<Table id="operationsTable" items="{path: 'modelSuper>/'}" inset="false">
 							<headerToolbar>
 								<Toolbar>
 									<content>
@@ -214,8 +214,8 @@
 							</columns>
 							<items>
 								<ColumnListItem vAlign="Middle">
-									<ObjectIdentifier title="{path: 'Description'}" text="{path: 'Activity'}"/>
-									<Label text="{path: 'DurationNormal'}"/>
+									<ObjectIdentifier title="{modelSuper>Description}" text="{modelSuper>Activity}"/>
+									<Label text="{modelSuper>DurationNormal}"/>
 									<Button icon="sap-icon://sys-cancel" type="Transparent" press="removeOperationFromTable"></Button>
 								</ColumnListItem>
 							</items>
@@ -238,7 +238,7 @@
 							<ToolbarSpacer/>
 							<Button class="roundClass" type="Accept" press="handleNavRight" icon="sap-icon://arrow-right"></Button>
 						</Toolbar>
-						<Table id="componentsTable" items="{/Components}" inset="false">
+						<Table id="componentsTable" items="{path: 'modelComponent>/'}" inset="false">
 							<headerToolbar>
 								<Toolbar>
 									<content>
@@ -265,10 +265,10 @@
 							</columns>
 							<items>
 								<ColumnListItem>
-									<ObjectIdentifier title="{MatlDesc}" text="{i18n>Material}"/>
-									<Label text="{i18n>ReqQty}"/>
-									<Label text="{i18n>ReqQtyU}"/>
-									<Label text="{Activity}"/>
+									<ObjectIdentifier title="{modelComponent>MatlDesc}" text="{modelComponent>Material}"/>
+									<Label text="{modelComponent>RequirementQuantity}" />
+									<Label id="RequirementQuantityUnit" text="{modelComponent>RequirementQuantityUnit}" />
+									<Label text="{modelComponent>Activity}"/>
 									<Button icon="sap-icon://sys-cancel" type="Transparent" press="removeComponentFromTable"></Button>
 								</ColumnListItem>
 							</items>

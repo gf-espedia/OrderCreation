@@ -252,6 +252,11 @@ sap.ui.define([
 			this._orderModel.setProperty("/Components", this._orderModel.getProperty("/Components").concat(this._newCompModel.getProperty(
 				"/NewComponents")));
 			this._newCompModel = null;
+			//Visualizzazione delle componenti
+			var OmodelComponent = new sap.ui.model.json.JSONModel();
+			OmodelComponent.setData(this._orderModel.oData.Components);
+			this.getView().setModel(OmodelComponent, "modelComponent");
+			//Visualizzazione delle componenti
 			this._newComponentDialog.close();
 			this._newComponentDialog.destroy();
 			this._newComponentDialog = undefined;
@@ -352,6 +357,12 @@ sap.ui.define([
 			this._orderModel.setProperty("/Operations", this._orderModel.getProperty("/Operations").concat(this._newOpModel.getProperty(
 				"/NewOperations")));
 			this._newOpModel = null;
+
+			//visualizzazione operazioni_ collegamento alla view con il path :// nella customList associata  (list id e label value)
+			var OmodelSuper = new sap.ui.model.json.JSONModel();
+			OmodelSuper.setData(this._orderModel.oData.Operations);
+			this.getView().setModel(OmodelSuper, "modelSuper");
+
 			this._newOperationDialog.close();
 			this._newOperationDialog.destroy();
 			this._newOperationDialog = undefined;
@@ -377,13 +388,25 @@ sap.ui.define([
 		},
 
 		removeOperationFromTable: function (oEvent) {
-			var selectedRow = oEvent.getSource().getBindingContext().getPath();
-			var oIndex = parseInt(selectedRow.substring(selectedRow.lastIndexOf('/') + 1), 10);
-			var data = this._orderModel.getProperty("/Operations");
-			data.splice(oIndex, 1);
-			this._orderModel.setProperty("/Operations", data);
-			this._orderModel.refresh();
+			//le parti non commentate sono le prove con i modelli aggiornati. Non legge la funzione .splice 
+			
+			//var selectedRow = oEvent.getSource().getBindingContext().getPath();
+			var selectedRowOp=oEvent.oSource.oParent.oBindingContexts.modelSuper.sPath; //riga selezionata
+			//var oIndex = parseInt(selectedRow.substring(selectedRow.lastIndexOf('/') + 1), 10);
+			var oIndex = selectedRowOp.substring(1); //indice di riga
+
+			var OmodelSuper = new sap.ui.model.json.JSONModel(); //dichiarazione del modello usato per la visualizzazione delle op a tabella
+			OmodelSuper.setData(this._orderModel.oData.Operations);//setta i dati nel modello
+			//var data = this._orderModel.getProperty("/Operations");
+			var data = OmodelSuper.oData[oIndex];
+			//delete(data.oIndex); //DOVREBBE cancellare i dati di una riga, ma non li cacella, perchè restano nel modello
+			//data.splice(oIndex);
+			data.splice(oIndex, 1); //restituisce l'errore che .splice non è una funzione
+			OmodelSuper.refresh(); //refresh del modello
+			//this._orderModel.setProperty("/Operations", data);
+			//this._orderModel.refresh();
 		},
+		
 
 		//navigation forward (right)
 		handleNavRight: function (evt) {
