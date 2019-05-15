@@ -48,7 +48,7 @@ sap.ui.define([
 
 		//cancella le foto alla selezione
 		deletePhotos: function (oEvent) {
-			var oModel = this.getView().getModel();
+			var oModel = this.getView().byId("cameraPage").getModel();
 			var aPhotos = oModel.getProperty("/photos");
 			var deletePhotos = oEvent.getSource().getBindingContext().getObject();
 			for (var i in aPhotos) {
@@ -62,7 +62,7 @@ sap.ui.define([
 
 		//download delle foto. /photos
 
-		onDownloadSelectedItems: function (oEvent) {
+		onDownloadSelectedPhotos: function (oEvent) {
 
 			//var oUploadCollection = oEvent.getSource().getId(); //prende l'id della view relativa
 			//var oData = this.byId(oUploadCollection).getModel().getData();
@@ -71,7 +71,7 @@ sap.ui.define([
 
 			if (selectedItems.lenght !== 0) { //controlla che il campo da scaricare sia selezionato. Caso contrario NON da errore
 
-				downloadableContent = this.getView().getModel().getProperty(selectedItems); //setta la property all'elemento selezionato
+				downloadableContent = this.getView().byId("cameraPage").getModel().getProperty(selectedItems); //setta la property all'elemento selezionato
 
 				downloadableContent.fileName = jQuery.now().toString(); //ricava la data di adesso in msec (=sempre univoco) e lo usiamo come nome temporaneo per il file 
 				downloadableContent.fileMimeType = downloadableContent.src.substring(5, 14); //tramite la substring 

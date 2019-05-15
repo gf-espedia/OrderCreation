@@ -23,7 +23,7 @@
 									</CustomListItem>
 								</items>
 							</List>
-							<Button id="downloadSelected" icon="sap-icon://download" press="onDownloadSelectedItems" enabled="true" type="Default" visible="true"
+							<Button id="downloadSelected" icon="sap-icon://download" press="onDownloadSelectedPhotos" enabled="true" type="Default" visible="true"
 								class="sapUiSmallMarginEnd">
 								<layoutData></layoutData>
 							</Button>

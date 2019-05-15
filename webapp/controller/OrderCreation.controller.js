@@ -23,6 +23,8 @@ sap.ui.define([
 	var idPage = ["qrCode", "orderCreatePage", "planning", "task", "component", "attachmentCamera"]; //id page array
 	var streamGlobal;
 	var closeCamera = false;
+	var arrayObjTable = [];
+	var arrayCompTable = [];
 
 	return BaseController.extend("com.espedia.demo.OrderCreation.controller.OrderCreation", {
 		uploadJSON: {}, //allegati
@@ -235,6 +237,7 @@ sap.ui.define([
 			this._newComponentDialog.close();
 			this._newComponentDialog.destroy();
 			this._newComponentDialog = undefined;
+			arrayCompTable = [];
 		},
 
 		onNewComponentConfirmPress: function () {
@@ -260,10 +263,11 @@ sap.ui.define([
 			this._newComponentDialog.close();
 			this._newComponentDialog.destroy();
 			this._newComponentDialog = undefined;
+			arrayCompTable = [];
 		},
 
 		newCompLiveChange: function (oEvent) {
-			//  this._newOpModel
+			this._newCompModel.refresh(); //ss
 			var lastIndex = this._newCompModel.getProperty("/NewComponents").length - 1;
 			var lastRow = "/NewComponents/" + lastIndex + "/";
 			if (
@@ -281,16 +285,43 @@ sap.ui.define([
 				};
 				this._newCompModel.getProperty("/NewComponents").push(newEmptyComp);
 				this._newCompModel.refresh();
+				if (arrayCompTable.length == 0) {
+					arrayCompTable.push(sap.ui.getCore().byId("newComponentsTable").getItems()[0]);
+				}
+				arrayCompTable.push(sap.ui.getCore().byId("newComponentsTable").getItems()[(sap.ui.getCore().byId("newComponentsTable").getItems()
+					.length - 1)]);
 			}
 		},
 
 		removeComponentFromTable: function (oEvent) {
-			var selectedRow = oEvent.getSource().getBindingContext().getPath();
-			var oIndex = parseInt(selectedRow.substring(selectedRow.lastIndexOf('/') + 1), 10);
-			var data = this._orderModel.getProperty("/Components");
-			data.splice(oIndex, 1);
-			this._orderModel.setProperty("/Components", data);
-			this._orderModel.refresh();
+			var selectedRowOp = oEvent.oSource.oParent.oBindingContexts.modelComponent.sPath; //riga selezionata
+
+			var oIndex = selectedRowOp.substring(1); //indice di riga
+
+			//var OmodelComponent = new sap.ui.model.json.JSONModel(); //dichiarazione del modello usato per la visualizzazione delle op a tabella
+			//OmodelComponent.setData(this._orderModel.oData.Components); //setta i dati nel modello
+
+			//var data = OmodelComponent.oData
+			var data = this._orderModel.oData.Components;
+
+			data.splice(oIndex, 1); //cancella la riga selezionata e restituisce la riga selezionata
+
+			var OmodelComponent = new sap.ui.model.json.JSONModel()
+			OmodelComponent.setData(data); //setta i dati nel modello
+
+			this.getView().setModel(OmodelComponent, "modelComponent");
+
+		},
+
+		finalCancelComp: function (oEvent) {
+			var selectedRow = oEvent.oSource.oParent.oBindingContexts.undefined.sPath; //seleziona la riga della tabella
+			var oIndex = selectedRow.split("/")[2]; //seleziona l'index relativo alla riga
+
+			sap.ui.getCore().byId("newComponentsTable").removeItem(arrayCompTable[oIndex]); //rimuove gli elementi a front-end
+
+			var data = sap.ui.getCore().byId("newComponentsTable").oModels.undefined.oData.NewComponents;
+			data.splice(oIndex, 1); // rimuove i dati selezionati dal modello
+			sap.ui.getCore().byId("newComponentsTable").oModels.undefined.refresh();
 		},
 		// END AGGIUNTA COMPONENTS ORDINE
 		////////////////////////////////
@@ -341,6 +372,7 @@ sap.ui.define([
 			this._newOperationDialog.close();
 			this._newOperationDialog.destroy();
 			this._newOperationDialog = undefined;
+			arrayObjTable = [];
 		},
 
 		onNewOperationConfirmPress: function () {
@@ -366,10 +398,12 @@ sap.ui.define([
 			this._newOperationDialog.close();
 			this._newOperationDialog.destroy();
 			this._newOperationDialog = undefined;
-
+			arrayObjTable = [];
 		},
 
 		newOpLiveChange: function (oEvent) {
+			this._newOpModel.refresh(); //ss
+
 			var lastIndex = this._newOpModel.getProperty("/NewOperations").length - 1;
 			var lastRow = "/NewOperations/" + lastIndex + "/";
 			if (
@@ -384,29 +418,40 @@ sap.ui.define([
 				};
 				this._newOpModel.getProperty("/NewOperations").push(newEmptyOp);
 				this._newOpModel.refresh();
+				if (arrayObjTable.length == 0) {
+					arrayObjTable.push(sap.ui.getCore().byId("newOperationsTable").getItems()[0]);
+				}
+				arrayObjTable.push(sap.ui.getCore().byId("newOperationsTable").getItems()[(sap.ui.getCore().byId("newOperationsTable").getItems().length -
+					1)]);
 			}
 		},
 
 		removeOperationFromTable: function (oEvent) {
-			//le parti non commentate sono le prove con i modelli aggiornati. Non legge la funzione .splice 
-			
-			//var selectedRow = oEvent.getSource().getBindingContext().getPath();
-			var selectedRowOp=oEvent.oSource.oParent.oBindingContexts.modelSuper.sPath; //riga selezionata
-			//var oIndex = parseInt(selectedRow.substring(selectedRow.lastIndexOf('/') + 1), 10);
+
+			var selectedRowOp = oEvent.oSource.oParent.oBindingContexts.modelSuper.sPath; //riga selezionata
+
 			var oIndex = selectedRowOp.substring(1); //indice di riga
 
+			var data = this._orderModel.oData.Operations;
+
+			data.splice(oIndex, 1); //cancella la riga selezionata e restituisce la riga selezionata
 			var OmodelSuper = new sap.ui.model.json.JSONModel(); //dichiarazione del modello usato per la visualizzazione delle op a tabella
-			OmodelSuper.setData(this._orderModel.oData.Operations);//setta i dati nel modello
-			//var data = this._orderModel.getProperty("/Operations");
-			var data = OmodelSuper.oData[oIndex];
-			//delete(data.oIndex); //DOVREBBE cancellare i dati di una riga, ma non li cacella, perchè restano nel modello
-			//data.splice(oIndex);
-			data.splice(oIndex, 1); //restituisce l'errore che .splice non è una funzione
-			OmodelSuper.refresh(); //refresh del modello
-			//this._orderModel.setProperty("/Operations", data);
-			//this._orderModel.refresh();
+			OmodelSuper.setData(data); //setta i dati nel modello
+
+			this.getView().setModel(OmodelSuper, "modelSuper");
 		},
-		
+
+		finalCancelOp: function (oEvent) {
+			var selectedRow = oEvent.oSource.oParent.oBindingContexts.undefined.sPath; //seleziona la riga della tabella
+			var oIndex = selectedRow.split("/")[2]; //seleziona l'index relativo alla riga
+
+			sap.ui.getCore().byId("newOperationsTable").removeItem(arrayObjTable[oIndex]); //rimuove gli elementi a front-end
+
+			var data = sap.ui.getCore().byId("newOperationsTable").oModels.undefined.oData.NewOperations;
+			data.splice(oIndex, 1); // rimuove i dati selezionati dal modello
+			sap.ui.getCore().byId("newOperationsTable").oModels.undefined.refresh();
+
+		},
 
 		//navigation forward (right)
 		handleNavRight: function (evt) {
@@ -436,9 +481,8 @@ sap.ui.define([
 			app.to(selectedPage, "show");
 			if (page == 0) {
 				this.scanCode();
-			} 
-			else if (page == 2) {
-                this.getView().byId("PlantAndWC").setValue("1710 -" );
+			} else if (page == 2) {
+				this.getView().byId("PlantAndWC").setValue("1710 -");
 			}
 		},
 
@@ -817,25 +861,25 @@ sap.ui.define([
 		//collegamento all'app della webCam
 
 		onCameraOpen: function () { //controllare l'ordine degli id
-				var app = this.byId("idAppControl");
-				var page = this.byId("cameraPage");
-				app.to(page, "show");
-				var oCamera = this.getView().byId("idCamera");
-				if (!firstOpenCamera) oCamera.rerender();
-				firstOpenCamera = false;
-				/*if(page.getId()!=="__component0---OrderCreation--cameraPage"){
-					oCamera.stopCamera();
-				}else{
-					oCamera.rerender();
-				}*/
-				
-			},
-			//fine collegamento all'app della webCam
+			var app = this.byId("idAppControl");
+			var page = this.byId("cameraPage");
+			app.to(page, "show");
+			var oCamera = this.getView().byId("idCamera");
+			if (!firstOpenCamera) oCamera.rerender();
+			firstOpenCamera = false;
+			/*if(page.getId()!=="__component0---OrderCreation--cameraPage"){
+				oCamera.stopCamera();
+			}else{
+				oCamera.rerender();
+			}*/
+
+		},
+		//fine collegamento all'app della webCam
 
 		//metodo per tornare alla view degli allegati. Inserito nel CameraController (anche qui funziona)
 
 		onBackToApp: function () {
-			var app = this.getView().byId("idAppControl");		
+			var app = this.getView().byId("idAppControl");
 			var page = this.getView().byId("navCon");
 			var oCamera = this.getView().byId("idCamera");
 			oCamera.stopCamera();

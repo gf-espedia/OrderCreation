@@ -6,7 +6,7 @@
 			<Button text="{i18n>Cancel}" press="onNewOperationCancelPress" type="Reject"/>
 		</buttons>
 		<content>
-			<Table id="newOperationsTable" items="{/NewOperations}" inset="false">
+			<Table id="newOperationsTable" items="{/NewOperations}" inset="false" >
 				<columns>
 					<Column minScreenWidth="Tablet" demandPopin="true" width="10%"/>
 					<Column minScreenWidth="Tablet" demandPopin="true">
@@ -26,7 +26,7 @@
 						<Input value="{path: 'Description'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>
 						<Input value="{path: 'DurationNormal'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>
 						<!--<Input value="{path: 'Acttype'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>-->
-						<Button icon="sap-icon://sys-cancel" type="Transparent"></Button>
+						<Button icon="sap-icon://sys-cancel" type="Transparent" press="finalCancelOp"></Button>
 					</ColumnListItem>
 				</items>
 			</Table>
