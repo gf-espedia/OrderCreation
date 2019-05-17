@@ -36,7 +36,7 @@ sap.ui.define([
 				photos: []
 			})); //attachments
 			this.scanCode();
-
+			
 			//attachments
 			this.getView().byId("attachmentCamera").setModel(new sap.ui.model.json.JSONModel({ //id: attachments -> attachmentCamera
 				"maximumFilenameLength": 80,
@@ -66,8 +66,13 @@ sap.ui.define([
 				"items": ["jpg", "txt", "ppt", "pptx", "doc", "docx", "xls", "xlsx", "pdf", "png"],
 				"selected": ["jpg", "txt", "ppt", "pptx", "doc", "docx", "xls", "xlsx", "pdf", "png"]
 			}), "fileTypes");
-
-		},
+				
+			var OmodelSuper = new sap.ui.model.json.JSONModel();
+			OmodelSuper.setData([{Activity :"0010", Description: "DescriptionTest", DurationNormal:"1"}]);
+			this.getView().setModel(OmodelSuper, "modelSuper");
+			
+			this._orderModel.setProperty("/Operations", [{Activity :"0010", Description: "DescriptionTest", DurationNormal:"1"}]);
+		}, //onInit
 		//link per l'apertura del calendario
 		openCalendar: function () {
 			window.open("https://workcentercalendar-m9a44f3468.dispatcher.hana.ondemand.com", "_blank");
@@ -394,7 +399,6 @@ sap.ui.define([
 			var OmodelSuper = new sap.ui.model.json.JSONModel();
 			OmodelSuper.setData(this._orderModel.oData.Operations);
 			this.getView().setModel(OmodelSuper, "modelSuper");
-
 			this._newOperationDialog.close();
 			this._newOperationDialog.destroy();
 			this._newOperationDialog = undefined;
@@ -482,7 +486,10 @@ sap.ui.define([
 			if (page == 0) {
 				this.scanCode();
 			} else if (page == 2) {
+				var date = new Date();
+				this.byId("PlDate").setDateValue(date);
 				this.getView().byId("PlantAndWC").setValue("1710 -");
+				
 			}
 		},
 
@@ -775,7 +782,7 @@ sap.ui.define([
 		},
 
 		onSelectAllPress: function (oEvent) {
-			var oUploadCollection = this.byId("attachments"); //CONTROLLARE QUESTO ID!!! DOVREBBE ESSERE RELATIVO ALL'UPLOAD COLLECTION
+			var oUploadCollection = this.byId("attachments"); 
 			if (!oEvent.getSource().getPressed()) {
 				this.deselectAllItems(oUploadCollection);
 				oEvent.getSource().setPressed(false);
@@ -885,7 +892,13 @@ sap.ui.define([
 			oCamera.stopCamera();
 			app.to(page, "show");
 
-		}
+		}/*,
+		
+		onSelectedPhotos: function(oEvent){
+			var oModel = this.getView().byId("cameraPage").getModel();
+			var aPhotos = oModel.getProperty("/photos");
+			//var selectedPhotos = oEvent.getSource().getBindingContext().getObject();
+		}*/
 
 	});
 });

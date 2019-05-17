@@ -23,10 +23,15 @@
 									</CustomListItem>
 								</items>
 							</List>
+								<Button id="photoSelected" icon="sap-icon://attachment" press="onSelectedPhotos" enabled="true" type="Default" visible="true"
+								class="sapUiSmallMarginEnd">
+								<layoutData></layoutData>
+							</Button>
 							<Button id="downloadSelected" icon="sap-icon://download" press="onDownloadSelectedPhotos" enabled="true" type="Default" visible="true"
 								class="sapUiSmallMarginEnd">
 								<layoutData></layoutData>
 							</Button>
+						
 						</items>
 					</FlexBox>
 				</l:sideContent>

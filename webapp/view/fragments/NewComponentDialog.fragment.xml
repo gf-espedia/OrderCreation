@@ -32,7 +32,7 @@
 						<Input value="{RequirementQuantity}" valueLiveUpdate="true" liveChange="newCompLiveChange"/>
 						<Input value="{RequirementQuantityUnit}" valueLiveUpdate="true" editable="false" liveChange="newCompLiveChange"/>
 						<Input value="{Activity}" valueLiveUpdate="true" liveChange="newCompLiveChange"/>
-						<Button icon="sap-icon://sys-cancel" type="Transparent" press="finalCancelComp"></Button>
+						<!--Button icon="sap-icon://sys-cancel" type="Transparent" press="finalCancelComp"></Button-->
 					</ColumnListItem>
 					<!--<ColumnListItem>-->
 					<!--	<Input value="{path: Material}" showValueHelp="true" valueHelpOnly="true" valueHelpRequest="handleMaterialF4" valueLiveUpdate="true"-->

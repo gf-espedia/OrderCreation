@@ -26,7 +26,7 @@
 						<Input value="{path: 'Description'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>
 						<Input value="{path: 'DurationNormal'}" valueLiveUpdate="true" liveChange="newOpLiveChange" type="Number"/>
 						<!--<Input value="{path: 'Acttype'}" valueLiveUpdate="true" liveChange="newOpLiveChange"/>-->
-						<Button icon="sap-icon://sys-cancel" type="Transparent" press="finalCancelOp"></Button>
+						<!--Button icon="sap-icon://sys-cancel" type="Transparent" press="finalCancelOp"></Button-->
 					</ColumnListItem>
 				</items>
 			</Table>

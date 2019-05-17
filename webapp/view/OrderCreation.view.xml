@@ -151,7 +151,7 @@
 										<f:FormElement label="{i18n>PlannedDate}">
 											<f:fields>
 												<DatePicker id="PlDate"
-													value="{path: '/Order/PlannedDate', type : 'sap.ui.model.odata.type.DateTime', constraints : {displayFormat : 'Date'}}"
+													value="{path: '/Order/PlannedDate', type : 'sap.ui.model.odata.type.DateTime', constraints : {displayFormat : 'LongDate'}}"
 													placeholder="Enter Date"/>
 											</f:fields>
 										</f:FormElement>
@@ -214,8 +214,8 @@
 							</columns>
 							<items>
 								<ColumnListItem vAlign="Middle">
-									<ObjectIdentifier title="{modelSuper>Description}" text="{modelSuper>Activity}"/>
-									<Label text="{modelSuper>DurationNormal}"/>
+									<ObjectIdentifier title="{modelSuper>Description}" text="{modelSuper>Activity}" />
+									<Label text="{modelSuper>DurationNormal}" />
 									<Button icon="sap-icon://sys-cancel" type="Transparent" press="removeOperationFromTable"></Button>
 								</ColumnListItem>
 							</items>
