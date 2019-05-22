@@ -103,21 +103,64 @@
 												</f:fields>
 											</f:FormElement>
 											<f:FormElement label="{i18n>Damage}">
-												<f:fields>
-													<Input value="({DamageCodegrp} - {DamageCodegrp}) {DamageCodeDescr} " editable="true"/>
-													<Input value="{DamageText}" placeholder="Damage Description" editable="true"/>
-												</f:fields>
-											</f:FormElement>
-											<f:FormElement label="{i18n>Cause}">
-												<f:fields>
-													<Input value="({CauseCodegrp} - {CauseCode}) {CauseCodeDescr}" editable="true"/>
-													<Input value="{CauseText}" placeholder="Cause Description" editable="true"/>
-												</f:fields>
-											</f:FormElement>
+											<f:fields>
+												<Input value="{/Damage}" showValueHelp="true" valueHelpRequest="handleDamageF4" valueHelpOnly="true" id="DamageInput"/>
+												<Input value="{/DamageText}" placeholder="{i18n>phDmg}"/>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>Cause}">
+											<f:fields>
+												<Input value="{/Cause}" showValueHelp="true" valueHelpRequest="handleCauseF4" valueHelpOnly="true" id="CauseInput"/>
+												<Input value="{/CauseText}" placeholder="{i18n>phCause}"/>
+											</f:fields>
+										</f:FormElement>
 										</f:formElements>
 									</f:FormContainer>
 								</f:formContainers>
 							</f:Form>
+							<f:Form id="breakdownForm" editable="true">
+							<f:title>
+								<core:Title text="{i18n>labelBD}"/>
+							</f:title>
+							<f:layout>
+								<f:ResponsiveGridLayout labelSpanXL="4" labelSpanL="3" labelSpanM="3" labelSpanS="12" adjustLabelSpan="true" emptySpanXL="0" emptySpanL="1"
+									emptySpanM="0" emptySpanS="0" columnsXL="2" columnsL="1" columnsM="1" singleContainerFullSize="false"/>
+							</f:layout>
+							<f:formContainers>
+								<f:FormContainer>
+									<f:formElements>
+										<f:FormElement label="{i18n>labelBD}">
+											<f:fields>
+												<Switch state="{/Breakdown}" customTextOn="On" customTextOff="Off" change="bdSwitchChange">
+													<layoutData>
+														<FlexItemData growFactor="1"/>
+													</layoutData>
+												</Switch>
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>labelMS}">
+											<f:fields>
+												<!--<DateTimeInput value="{MalfunctionStart}" id="msInput" type="DateTime" placeholder="dd MMM y, HH:mm" editable="false"/>
+												<DatePicker id="msInput" value="{/MalfunctionStart}" editable="false" valueFormat="yyyy-MM-dd" placeholder="Enter Date"/>-->
+												<DatePicker id="msInput"
+												value="{path: '/Order/MalfunctionStart', type : 'sap.ui.model.odata.type.DateTime', constraints : {displayFormat : 'LongDate'}}"
+													placeholder="{i18n>phDate}"  editable="false"/>
+													
+											</f:fields>
+										</f:FormElement>
+										<f:FormElement label="{i18n>labelME}">
+											<f:fields>
+												<!--<DateTimeInput value="{MalfunctionEnd}" id="meInput" type="DateTime" placeholder="dd MMM y, HH:mm" editable="false"/>
+												<DatePicker id="meInput" value="{/MalfunctionEnd}" editable="false" valueFormat="yyyy-MM-dd" placeholder="Enter Date"/>-->
+												<DatePicker id="meInput"
+													value="{path: '/Order/MalfunctionEnd', type : 'sap.ui.model.odata.type.DateTime', constraints : {displayFormat : 'Date'}}"
+													placeholder="{i18n>phDate}" editable="false"/>
+											</f:fields>
+										</f:FormElement>
+									</f:formElements>
+								</f:FormContainer>
+							</f:formContainers>
+						</f:Form>
 						</VBox>
 					</content>
 					<footer>
@@ -152,7 +195,7 @@
 											<f:fields>
 												<DatePicker id="PlDate"
 													value="{path: '/Order/PlannedDate', type : 'sap.ui.model.odata.type.DateTime', constraints : {displayFormat : 'LongDate'}}"
-													placeholder="Enter Date"/>
+													placeholder="{i18n>phDate}" editable="false"/>
 											</f:fields>
 										</f:FormElement>
 										<f:FormElement label="Priority">

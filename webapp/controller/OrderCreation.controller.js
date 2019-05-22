@@ -27,6 +27,8 @@ sap.ui.define([
 	var arrayCompTable = [];
 
 	return BaseController.extend("com.espedia.demo.OrderCreation.controller.OrderCreation", {
+		PhotoNumberAttach: 0,
+		
 		uploadJSON: {}, //allegati
 		onInit: function () {
 			this.mutableJSONOrdCreate = JSON.parse(JSON.stringify(this.orderCreationModel));
@@ -36,9 +38,9 @@ sap.ui.define([
 				photos: []
 			})); //attachments
 			this.scanCode();
-			
+
 			//attachments
-			this.getView().byId("attachmentCamera").setModel(new sap.ui.model.json.JSONModel({ //id: attachments -> attachmentCamera
+			this.getView().byId("attachmentCamera").setModel(new sap.ui.model.json.JSONModel({ //id: attachments -> attachmentCamera è l'id della pagina dove si trovano gli allegati
 				"maximumFilenameLength": 80,
 				"maximumFileSize": 10,
 				"mode": MobileLibrary.ListMode.SingleSelectMaster,
@@ -66,12 +68,20 @@ sap.ui.define([
 				"items": ["jpg", "txt", "ppt", "pptx", "doc", "docx", "xls", "xlsx", "pdf", "png"],
 				"selected": ["jpg", "txt", "ppt", "pptx", "doc", "docx", "xls", "xlsx", "pdf", "png"]
 			}), "fileTypes");
-				
+
 			var OmodelSuper = new sap.ui.model.json.JSONModel();
-			OmodelSuper.setData([{Activity :"0010", Description: "DescriptionTest", DurationNormal:"1"}]);
+			OmodelSuper.setData([{
+				Activity: "0010",
+				Description: "DescriptionTest",
+				DurationNormal: "1"
+			}]);
 			this.getView().setModel(OmodelSuper, "modelSuper");
-			
-			this._orderModel.setProperty("/Operations", [{Activity :"0010", Description: "DescriptionTest", DurationNormal:"1"}]);
+
+			this._orderModel.setProperty("/Operations", [{
+				Activity: "0010",
+				Description: "DescriptionTest",
+				DurationNormal: "1"
+			}]);
 		}, //onInit
 		//link per l'apertura del calendario
 		openCalendar: function () {
@@ -489,7 +499,7 @@ sap.ui.define([
 				var date = new Date();
 				this.byId("PlDate").setDateValue(date);
 				this.getView().byId("PlantAndWC").setValue("1710 -");
-				
+
 			}
 		},
 
@@ -755,11 +765,11 @@ sap.ui.define([
 				"fileThumbnailUrl": "",
 				"fileURL": fileURL,
 				"attributes": [{
-					"title": "Data di caricamento",
+					"title": this.getView().getModel("i18n").getResourceBundle().getText("uploadDate"),
 					"text": that.uploadJSON.fileUploadDate,
 					"active": false
 				}, {
-					"title": "Dimensione",
+					"title": this.getView().getModel("i18n").getResourceBundle().getText("dimension"),
 					"text": that.uploadJSON.fileDimension,
 					"active": false
 				}],
@@ -782,7 +792,7 @@ sap.ui.define([
 		},
 
 		onSelectAllPress: function (oEvent) {
-			var oUploadCollection = this.byId("attachments"); 
+			var oUploadCollection = this.byId("attachments");
 			if (!oEvent.getSource().getPressed()) {
 				this.deselectAllItems(oUploadCollection);
 				oEvent.getSource().setPressed(false);
@@ -892,13 +902,167 @@ sap.ui.define([
 			oCamera.stopCamera();
 			app.to(page, "show");
 
-		}/*,
+		},
+
+		onSelectedPhotos: function (oEvent) {
+			
 		
-		onSelectedPhotos: function(oEvent){
+			
 			var oModel = this.getView().byId("cameraPage").getModel();
 			var aPhotos = oModel.getProperty("/photos");
+
+			var index = aPhotos.length - 1;
+			var PhotosSelected = aPhotos[index]; //prende la foto selezionata
+			//in memoria ha solo l'url
+
+			//var oTimeFormat = sap.ui.core.format.DateFormat.getTimeInstance();
+			var time = new Date(jQuery.now()).toLocaleDateString();
+			var content = PhotosSelected.src.split(',')[1];
+			
+			var blobForURL = this.base64toBlob(content, "image/png");
+			var fileURL = URL.createObjectURL(blobForURL);
+			
+			this.PhotoNumberAttach++;
+			//attributi per l'immagine 
+			this.byId("attachmentCamera").getModel().getData()["Attachments"].unshift({
+				"fileId": jQuery.now().toString(),
+				"fileName": this.getView().getModel("i18n").getResourceBundle().getText("photo") + this.PhotoNumberAttach + ".png",
+				"fileMimeType": "image/png",
+				"fileDimension": "",
+				"fileExtension": "png",
+				"fileUploadDate": time,
+				"fileContent": content,
+				"fileThumbnailUrl": "",
+				"fileURL": fileURL,
+				"attributes": [{
+					"title": this.getView().getModel("i18n").getResourceBundle().getText("uploadDate"),
+					"text": time,
+					"active": false
+				}],
+				"selected": false
+			})			
+			var app = this.getView().byId("idAppControl"); 
+			var pageToNav = this.byId("navCon");
+			var oCamera = this.getView().byId("idCamera");
+			oCamera.stopCamera();
+			app.to(pageToNav, "show");
+
+			//this.byId("attachments").getModel().getData().Attachments.push(PhotoObj);
+			this.byId("attachments").getModel().refresh();
 			//var selectedPhotos = oEvent.getSource().getBindingContext().getObject();
-		}*/
+		},
+		handleDamageF4: function (oEvent) {
+			var sInputValue = oEvent.getSource().getValue();
+			this.inputId = oEvent.getSource().getId();
+			this.catalogSearchHelp(sInputValue, "Damage");
+			this._catalog = "Damage";
+		},
+
+		handleCauseF4: function (oEvent) {
+			var sInputValue = oEvent.getSource().getValue();
+			this.inputId = oEvent.getSource().getId();
+			this.catalogSearchHelp(sInputValue, "Cause");
+			this._catalog = "Cause";
+		},
+		
+		//search Help per Damage e Cause
+		catalogSearchHelp: function (input, catalog) {
+			// create value help dialog
+			if (!this._catalogHelpDialog) {
+				this._catalogHelpDialog = sap.ui.xmlfragment(
+					"com.espedia.demo.OrderCreation.view.fragments.CatalogDialog",
+					this
+				);
+				this.getView().addDependent(this._catalogHelpDialog);
+			}
+
+			if (catalog === "Damage") {
+
+				this._aFilter = new sap.ui.model.Filter({
+					filters: [
+						new sap.ui.model.Filter(
+							"Catalogtype",
+							sap.ui.model.FilterOperator.EQ, "C"
+						),
+						new sap.ui.model.Filter(
+							"Catalogid",
+							sap.ui.model.FilterOperator.EQ, "ZPM1"
+						)
+					],
+					and: true
+				});
+
+			} else if (catalog === "Cause") {
+				this._aFilter = new sap.ui.model.Filter({
+					filters: [
+						new sap.ui.model.Filter(
+							"Catalogtype",
+							sap.ui.model.FilterOperator.EQ, "5"
+						),
+						new sap.ui.model.Filter(
+							"Catalogid",
+							sap.ui.model.FilterOperator.EQ, "ZPM1"
+						)
+					],
+					and: true
+				});
+			}
+			this._catalogHelpDialog.getBinding("items").filter(this._aFilter);
+			// create a filter for the binding
+			/*this._catalogHelpDialog.getBinding("items").filter([new sap.ui.model.Filter(
+				"Equnr",
+				sap.ui.model.FilterOperator.Contains, sInputValue
+			)]);*/
+			// open value help dialog filtered by the input value
+			this._catalogHelpDialog.open();
+		}, //** search Help per Damage e Cause
+		_handleCatalogHelpSearch: function (evt) {
+
+			var sValue = evt.getParameter("value");
+			var oFilter = new sap.ui.model.Filter(
+				"CodeDescr",
+				sap.ui.model.FilterOperator.Contains, sValue
+			);
+			if (sValue === "") {
+				evt.getSource().getBinding("items").filter([]);
+				evt.getSource().getBinding("items").filter(this._aFilter);
+			} else {
+				evt.getSource().getBinding("items").filter([oFilter, this._aFilter]);
+			}
+
+		},
+
+		_handleCatalogHelpClose: function (evt) {
+			var oSelectedItem = evt.getParameter("selectedItem");
+			if (oSelectedItem) {
+				//var catalogInput = sap.ui.getCore().byId(this.inputId);
+				//	catalogInput.setValue("(" + oSelectedItem.getTitle() + ") " + oSelectedItem.getDescription());
+				if (this._catalog === "Cause") {
+					this._orderModel.setProperty("/Cause", "(" + oSelectedItem.getTitle() + ") " + oSelectedItem.getDescription());
+					this._orderModel.setProperty("/CauseCode", oSelectedItem.getTitle());
+					this.getView().byId("CauseInput").setValue("(" + oSelectedItem.getTitle() + ") " + oSelectedItem.getDescription());
+				} else if (this._catalog === "Damage") {
+					this._orderModel.setProperty("/Damage", "(" + oSelectedItem.getTitle() + ") " + oSelectedItem.getDescription());
+					this._orderModel.setProperty("/DamageCode", oSelectedItem.getTitle());
+					this.getView().byId("DamageInput").setValue("(" + oSelectedItem.getTitle() + ") " + oSelectedItem.getDescription());
+				}
+				this._orderModel.refresh();
+			}
+			//evt.getSource().getBinding("items").filter([]);
+			this._catalogHelpDialog.getBinding("items").filter([]);
+		},
+		
+				bdSwitchChange: function (oEvent) {
+			var state = oEvent.getSource().getState();
+			this.getView().byId("msInput").setEditable(state);
+			this.getView().byId("meInput").setEditable(state);
+			if (!state) {
+				//	this.getView().byId("msInput").setValue("");
+				//	this.getView().byId("meInput").setValue("");
+				this._notifModel.setProperty("/MalfunctionStart", "");
+				this._notifModel.setProperty("/MalfunctionEnd", "");
+			}
+		},
 
 	});
 });

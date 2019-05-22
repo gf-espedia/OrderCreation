@@ -1,0 +1,6 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+	<SelectDialog  id="catalogDialog" title="{i18n>cdTitle}" class="sapUiPopupWithPadding" search="_handleCatalogHelpSearch" items="{/CatalogSet}"
+		confirm="_handleCatalogHelpClose" cancel="_handleCatalogHelpClose">
+		<StandardListItem iconInset="false" title="{Catalogid} - {Code}" description="{CodeDescr}"/>
+	</SelectDialog>
+</core:FragmentDefinition>
