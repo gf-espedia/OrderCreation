@@ -71,15 +71,15 @@ sap.ui.define([
 
 			var OmodelSuper = new sap.ui.model.json.JSONModel();
 			OmodelSuper.setData([{
-				Activity: "0010",
-				Description: "DescriptionTest",
+				Activity: "0010",			//harcodato
+				Description: "New Operation",
 				DurationNormal: "1"
 			}]);
 			this.getView().setModel(OmodelSuper, "modelSuper");
 
 			this._orderModel.setProperty("/Operations", [{
-				Activity: "0010",
-				Description: "DescriptionTest",
+				Activity: "0010",			//harcodato
+				Description: "New Operation",
 				DurationNormal: "1"
 			}]);
 		}, //onInit
